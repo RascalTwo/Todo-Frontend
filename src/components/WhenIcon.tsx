@@ -1,18 +1,21 @@
-
 import React from 'react';
-import { makeStyles } from "@material-ui/core";
+import { makeStyles } from '@material-ui/core';
 import { AccessTime } from '@material-ui/icons';
-
 
 const useStyles = makeStyles({
   wrapper: {
     display: 'inline-flex',
-    verticalAlign: 'middle',
+    verticalAlign: 'middle'
   }
 });
 
-
-export default function WhenIcon({ created, updated }: { created: Date, updated: Date }){
+export default function WhenIcon({
+  created,
+  updated
+}: {
+  created: Date;
+  updated: Date;
+}): JSX.Element {
   const styles = useStyles();
 
   const isUpdated = created.getTime() !== updated.getTime();
@@ -25,5 +28,5 @@ export default function WhenIcon({ created, updated }: { created: Date, updated:
     <span className={styles.wrapper} title={title}>
       <AccessTime />
     </span>
-  )
+  );
 }

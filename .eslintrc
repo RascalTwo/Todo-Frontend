@@ -1,0 +1,42 @@
+{
+	"extends": [
+		"eslint:recommended",
+		"plugin:@typescript-eslint/recommended",
+		"plugin:react/recommended",
+		"prettier"
+	],
+	"parser": "@typescript-eslint/parser",
+	"plugins": [
+		"react",
+		"prettier"
+	],
+	"settings": {
+		"react": {
+			"version": "detect"
+		}
+	},
+	"rules": {
+		"quotes": [
+			1,
+			"single"
+		],
+		"arrow-parens": [
+			1,
+			"as-needed"
+		],
+		"max-len": [
+			1,
+			100
+		],
+		"semi": [
+			1,
+			"always"
+		],
+		"no-multiple-empty-lines": [
+			1,
+			{
+				"max": 1
+			}
+		]
+	}
+}
