@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 import { Box, Button, Card, Checkbox, Container, Divider, FormGroup, FormHelperText, IconButton, InputBase, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, makeStyles, Paper, TextField } from '@material-ui/core'
 import EditIcon from '@material-ui/icons/Edit';
@@ -15,6 +15,13 @@ type Todo = {
   updated: Date
   text: string
   completed: Date | null
+}
+
+type LocalTodo = {
+  created: number
+  updated: number
+  text: string
+  completed: number | null
 }
 
 const useWhenTextStyles = makeStyles({
@@ -154,7 +161,29 @@ function NewTodo({ addTodo }: { addTodo: (text: string) => void }){
 }
 
 function App() {
-  const [todos, setTodos] = useState<Todo[]>([{ completed: null, created: new Date(), text: 'Hello, world!', updated: new Date() }]);
+  const [todos, setTodoValues] = useState<Todo[]>([]);
+
+  const syncTodos = useCallback((todos: Todo[]) => {
+    if (todos.length) localStorage.setItem('todos', JSON.stringify(todos));
+    else localStorage.removeItem('todos');
+  }, []);
+
+  const setTodos = useCallback((newTodos: Todo[]) => {
+    setTodoValues(newTodos);
+    syncTodos(newTodos);
+  }, []);
+
+  useEffect(() => {
+    const rawTodos = localStorage.getItem('todos');
+    if (rawTodos !== null) setTodoValues(JSON.parse(rawTodos).map(({ created, updated, text, completed }: LocalTodo) => ({
+      created: new Date(created),
+      updated: new Date(updated),
+      completed: completed === null ? completed : new Date(completed),
+      text
+    })));
+
+    return () => syncTodos(todos);
+  }, []);
 
 
 
