@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-import { Box, Button, Card, Checkbox, Container, Divider, FormGroup, IconButton, InputBase, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, makeStyles, Paper, TextField } from '@material-ui/core'
+import { Box, Button, Card, Checkbox, Container, Divider, FormGroup, FormHelperText, IconButton, InputBase, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, makeStyles, Paper, TextField } from '@material-ui/core'
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import CancelIcon from '@material-ui/icons/Cancel';
@@ -52,11 +52,13 @@ const useTodoItemStyles = makeStyles({
 function TodoItem({ todo, deleteTodo, updateTodo, toggleCompleted }: { todo: Todo, deleteTodo: () => void, updateTodo: (text: string) => void, toggleCompleted: () => void }){
   const styles = useTodoItemStyles();
   const [editing, setEditing] = useState(false);
+  const [error, setError] = useState<string|undefined>();
 
   const textField = useRef<HTMLDivElement|null>(null);
 
   useEffect(() => {
     if (editing && textField.current) textField.current.querySelector('input')!.focus();
+    if (!editing && error) setError(undefined);
   }, [editing]);
 
   const itemIcon = (
@@ -75,12 +77,13 @@ function TodoItem({ todo, deleteTodo, updateTodo, toggleCompleted }: { todo: Tod
           try{
             updateTodo(((e.target as HTMLFormElement).elements[1] as HTMLInputElement).value);
             setEditing(false);
+            setError(undefined);
           } catch(e){
-            alert(e);
+            setError(e.message);
           }
         }}>
           {itemIcon}
-          <TextField ref={textField} placeholder="Item" defaultValue={todo.text} />
+          <TextField ref={textField} error={!!error} helperText={error} placeholder="Item" defaultValue={todo.text} />
           <ListItemSecondaryAction>
             <IconButton type="submit" title="Edit">
               <SaveIcon />
@@ -117,11 +120,17 @@ const useNewTodoStyles = makeStyles({
   },
   input: {
     flex: '1'
+  },
+  errorText: {
+    display: 'flex',
+    alignItems: 'center'
   }
 })
 
 function NewTodo({ addTodo }: { addTodo: (text: string) => void }){
   const styles = useNewTodoStyles();
+  const [error, setError] = useState<string|undefined>();
+
   return (
     <Paper component="form" className={styles.form} onSubmit={e => {
       e.preventDefault();
@@ -130,11 +139,13 @@ function NewTodo({ addTodo }: { addTodo: (text: string) => void }){
       try{
         addTodo(input.value);
         input.value = '';
+        setError(undefined)
       } catch(e){
-        alert(e);
+        setError(e.message);
       }
     }}>
-      <InputBase className={styles.input} placeholder="New Item" />
+      <InputBase error={!!error} className={styles.input} placeholder="New Item" />
+      <FormHelperText error={!!error} className={styles.errorText}>{error}</FormHelperText>
       <IconButton type="submit" title="Add Item">
         <AddIcon/>
       </IconButton>
