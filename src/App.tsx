@@ -9,12 +9,14 @@ import { serializeTodos, parseTodos } from './todo';
 import { Todo } from './types';
 import * as API from './API';
 
-const useLocallySavedTodos = (): [Todo[], React.Dispatch<React.SetStateAction<Todo[]>>] => {
+const useLocallySavedTodos = (
+  code: string
+): [Todo[], React.Dispatch<React.SetStateAction<Todo[]>>] => {
   const [todos, setTodoValues] = useState<Todo[]>([]);
 
   const syncTodos = useCallback((todos: Todo[]) => {
-    if (todos.length) localStorage.setItem('todos', JSON.stringify(serializeTodos(todos)));
-    else localStorage.removeItem('todos');
+    if (todos.length) localStorage.setItem(`todos-${code}`, JSON.stringify(serializeTodos(todos)));
+    else localStorage.removeItem(`todos-${code}`);
   }, []);
 
   const setTodos = useCallback(
@@ -28,7 +30,7 @@ const useLocallySavedTodos = (): [Todo[], React.Dispatch<React.SetStateAction<To
   );
 
   useEffect(() => {
-    const rawTodos = localStorage.getItem('todos');
+    const rawTodos = localStorage.getItem(`todos-${code}`);
     if (rawTodos !== null) setTodoValues(parseTodos(JSON.parse(rawTodos)));
 
     return () => syncTodos(todos);
@@ -40,15 +42,15 @@ const useLocallySavedTodos = (): [Todo[], React.Dispatch<React.SetStateAction<To
 function App(): JSX.Element {
   const code = useRef(window.location.pathname.slice(1)).current;
 
-  const [todos, setTodos] = useLocallySavedTodos();
+  const [todos, setTodos] = useLocallySavedTodos(code);
   const [serverOnline, setServerOnline] = useState<boolean | null>(null);
 
   useEffect(() => {
-    API.isServerOnline().then(setServerOnline);
+    API.isServerOnline().then(online => setServerOnline(Boolean(code && online)));
   }, []);
 
   useEffect(() => {
-    if (!serverOnline || !code) return;
+    if (!serverOnline) return;
     API.readTodos(code).then(parseTodos).then(setTodos);
   }, [serverOnline]);
 
