@@ -8,7 +8,7 @@ import { LocalTodo, Todo } from './types';
 
 import './App.css';
 
-const useLocallySavedTodos = (): [Todo[], (newTodos: Todo[]) => void] => {
+const useLocallySavedTodos = (): [Todo[], React.Dispatch<React.SetStateAction<Todo[]>>] => {
   const [todos, setTodoValues] = useState<Todo[]>([]);
 
   const syncTodos = useCallback((todos: Todo[]) => {
@@ -16,10 +16,15 @@ const useLocallySavedTodos = (): [Todo[], (newTodos: Todo[]) => void] => {
     else localStorage.removeItem('todos');
   }, []);
 
-  const setTodos = useCallback((newTodos: Todo[]) => {
-    setTodoValues(newTodos);
-    syncTodos(newTodos);
-  }, []);
+  const setTodos = useCallback(
+    (newTodos: React.SetStateAction<Todo[]>) =>
+      setTodoValues(prevTodos => {
+        const actualTodos = newTodos instanceof Function ? newTodos(prevTodos) : newTodos;
+        syncTodos(actualTodos);
+        return actualTodos;
+      }),
+    []
+  );
 
   useEffect(() => {
     const rawTodos = localStorage.getItem('todos');
@@ -42,48 +47,84 @@ const useLocallySavedTodos = (): [Todo[], (newTodos: Todo[]) => void] => {
 function App(): JSX.Element {
   const [todos, setTodos] = useLocallySavedTodos();
 
-  return (
-    <Container fixed maxWidth="sm">
-      <NewTodo
-        addTodo={newText => {
+  const addTodo = useCallback(
+    newText =>
+      new Promise<void>((resolve, reject) =>
+        setTodos(todos => {
           const existingTodo = todos.find(({ text }) => text === newText);
-          if (existingTodo) throw new Error('TODO already exists');
-          setTodos([
+          if (existingTodo) {
+            reject(new Error('TODO already exists'));
+            return todos;
+          }
+          resolve();
+          return [
             ...todos,
             { created: new Date(), updated: new Date(), text: newText, completed: null }
-          ]);
-        }}
-      />
+          ];
+        })
+      ),
+    [setTodos]
+  );
+
+  const updateTodo = useCallback(
+    (created, newText) =>
+      new Promise<void>((resolve, reject) => {
+        return setTodos(todos => {
+          const existingTodo = todos.find(
+            todo => created !== todo.created && todo.text === newText
+          );
+          if (existingTodo) {
+            reject(Error('TODO already exists'));
+            return todos;
+          }
+          resolve();
+          return todos.map(todo =>
+            todo.created === created
+              ? {
+                  ...todo,
+                  updated: new Date(),
+                  text: newText
+                }
+              : todo
+          );
+        });
+      }),
+    [setTodos]
+  );
+
+  const deleteTodo = useCallback(
+    created => setTodos(todos => todos.filter(todo => todo.created !== created)),
+    [setTodos]
+  );
+
+  const toggleCompleted = useCallback(
+    created =>
+      setTodos(todos =>
+        todos.map(todo =>
+          todo.created === created
+            ? {
+                ...todo,
+                completed: todos.find(todo => todo.created === created)?.completed
+                  ? null
+                  : new Date()
+              }
+            : todo
+        )
+      ),
+    [setTodos]
+  );
+
+  return (
+    <Container fixed maxWidth="sm">
+      <NewTodo addTodo={addTodo} />
       <List>
         {todos.map((item, i) => (
           <TodoItem
             key={i}
             todo={item}
-            updateTodo={newText => {
-              const existingTodo = todos.find(({ text }, ti) => i !== ti && text === newText);
-              if (existingTodo) throw new Error('TODO already exists');
-              return setTodos(
-                todos.map(todo =>
-                  todo.created === item.created
-                    ? {
-                        ...todo,
-                        updated: new Date(),
-                        text: newText
-                      }
-                    : todo
-                )
-              );
-            }}
-            deleteTodo={() => setTodos(todos.filter(todo => todo.created !== item.created))}
-            toggleCompleted={() =>
-              setTodos(
-                todos.map(todo =>
-                  todo.created === item.created
-                    ? { ...todo, completed: item.completed ? null : new Date() }
-                    : todo
-                )
-              )
-            }
+            onUpdate={updateTodo}
+            onDelete={deleteTodo}
+            onToggle={toggleCompleted}
           />
         ))}
       </List>
