@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { makeStyles } from '@material-ui/core';
-import { AccessTime } from '@material-ui/icons';
+
+import AccessTimeIcon from '@material-ui/icons/AccessTime';
 
 const useStyles = makeStyles({
   wrapper: {
@@ -23,7 +24,7 @@ export default React.memo(
 
     return (
       <span className={styles.wrapper} title={title}>
-        <AccessTime />
+        <AccessTimeIcon />
       </span>
     );
   },

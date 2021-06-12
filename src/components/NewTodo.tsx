@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
-import { FormHelperText, IconButton, InputBase, makeStyles, Paper } from '@material-ui/core';
+import { makeStyles, FormHelperText, IconButton, InputBase, Paper } from '@material-ui/core';
+
 import AddIcon from '@material-ui/icons/Add';
 
 const useStyles = makeStyles({

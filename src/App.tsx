@@ -6,8 +6,6 @@ import TodoItem from './components/TodoItem';
 
 import { LocalTodo, Todo } from './types';
 
-import './App.css';
-
 const useLocallySavedTodos = (): [Todo[], React.Dispatch<React.SetStateAction<Todo[]>>] => {
   const [todos, setTodoValues] = useState<Todo[]>([]);
 

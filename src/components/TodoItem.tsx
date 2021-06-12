@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
+  makeStyles,
   Checkbox,
   IconButton,
   ListItem,
   ListItemIcon,
   ListItemSecondaryAction,
   ListItemText,
-  makeStyles,
   TextField
 } from '@material-ui/core';
 
