@@ -1,16 +1,19 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Container, List } from '@material-ui/core';
 
 import NewTodo from './components/NewTodo';
 import TodoItem from './components/TodoItem';
 
-import { LocalTodo, Todo } from './types';
+import { serializeTodos, parseTodos } from './todo';
+
+import { Todo } from './types';
+import * as API from './API';
 
 const useLocallySavedTodos = (): [Todo[], React.Dispatch<React.SetStateAction<Todo[]>>] => {
   const [todos, setTodoValues] = useState<Todo[]>([]);
 
   const syncTodos = useCallback((todos: Todo[]) => {
-    if (todos.length) localStorage.setItem('todos', JSON.stringify(todos));
+    if (todos.length) localStorage.setItem('todos', JSON.stringify(serializeTodos(todos)));
     else localStorage.removeItem('todos');
   }, []);
 
@@ -26,15 +29,7 @@ const useLocallySavedTodos = (): [Todo[], React.Dispatch<React.SetStateAction<To
 
   useEffect(() => {
     const rawTodos = localStorage.getItem('todos');
-    if (rawTodos !== null)
-      setTodoValues(
-        JSON.parse(rawTodos).map(({ created, updated, text, completed }: LocalTodo) => ({
-          created: new Date(created),
-          updated: new Date(updated),
-          completed: completed === null ? completed : new Date(completed),
-          text
-        }))
-      );
+    if (rawTodos !== null) setTodoValues(parseTodos(JSON.parse(rawTodos)));
 
     return () => syncTodos(todos);
   }, []);
@@ -43,10 +38,22 @@ const useLocallySavedTodos = (): [Todo[], React.Dispatch<React.SetStateAction<To
 };
 
 function App(): JSX.Element {
+  const code = useRef(window.location.pathname.slice(1)).current;
+
   const [todos, setTodos] = useLocallySavedTodos();
+  const [serverOnline, setServerOnline] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    API.isServerOnline().then(setServerOnline);
+  }, []);
+
+  useEffect(() => {
+    if (!serverOnline || !code) return;
+    API.readTodos(code).then(parseTodos).then(setTodos);
+  }, [serverOnline]);
 
   const addTodo = useCallback(
-    newText =>
+    (newText: string) =>
       new Promise<void>((resolve, reject) =>
         setTodos(todos => {
           const existingTodo = todos.find(({ text }) => text === newText);
@@ -55,17 +62,21 @@ function App(): JSX.Element {
             return todos;
           }
           resolve();
-          return [
-            ...todos,
-            { created: new Date(), updated: new Date(), text: newText, completed: null }
-          ];
+          const todo = { created: new Date(), updated: new Date(), text: newText, completed: null };
+          if (!serverOnline) return [...todos, todo];
+
+          API.createTodo(code, todo)
+            .then(rawTodo => parseTodos([rawTodo])[0])
+            .then(todo => setTodos([...todos, todo]));
+
+          return todos;
         })
       ),
-    [setTodos]
+    [setTodos, serverOnline, API.createTodo]
   );
 
   const updateTodo = useCallback(
-    (created, newText) =>
+    (created: Date, newText: string) =>
       new Promise<void>((resolve, reject) => {
         return setTodos(todos => {
           const existingTodo = todos.find(
@@ -76,40 +87,49 @@ function App(): JSX.Element {
             return todos;
           }
           resolve();
-          return todos.map(todo =>
-            todo.created === created
-              ? {
-                  ...todo,
-                  updated: new Date(),
-                  text: newText
-                }
-              : todo
-          );
+          const updated = new Date();
+          return todos.map(todo => {
+            if (todo.created !== created) return todo;
+
+            const updatedTodo = {
+              ...todo,
+              updated,
+              text: newText
+            };
+            if (serverOnline) API.updateTodo(code, updatedTodo);
+            return updatedTodo;
+          });
         });
       }),
-    [setTodos]
+    [setTodos, serverOnline, API.updateTodo]
   );
 
   const deleteTodo = useCallback(
-    created => setTodos(todos => todos.filter(todo => todo.created !== created)),
-    [setTodos]
+    (created: Date) =>
+      setTodos(todos =>
+        todos.filter(todo => {
+          if (todo.created !== created) return true;
+          if (serverOnline) API.deleteTodo(code, todo.created);
+          return false;
+        })
+      ),
+    [setTodos, serverOnline, API.deleteTodo]
   );
 
   const toggleCompleted = useCallback(
     created =>
       setTodos(todos =>
-        todos.map(todo =>
-          todo.created === created
-            ? {
-                ...todo,
-                completed: todos.find(todo => todo.created === created)?.completed
-                  ? null
-                  : new Date()
-              }
-            : todo
-        )
+        todos.map(todo => {
+          if (todo.created !== created) return todo;
+          const updatedTodo = {
+            ...todo,
+            completed: todos.find(todo => todo.created === created)?.completed ? null : new Date()
+          };
+          if (serverOnline) API.updateTodo(code, updatedTodo);
+          return updatedTodo;
+        })
       ),
-    [setTodos]
+    [setTodos, serverOnline, API.updateTodo]
   );
 
   return (
