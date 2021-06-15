@@ -3,46 +3,23 @@ import { Container, List } from '@material-ui/core';
 
 import NewTodo from './components/NewTodo';
 import TodoItem from './components/TodoItem';
+import ThemeToggler from './components/ThemeToggler';
 
 import { serializeTodos, parseTodos } from './todo';
 
 import { Todo } from './types';
 import * as API from './API';
-
-const useLocallySavedTodos = (
-  code: string
-): [Todo[], React.Dispatch<React.SetStateAction<Todo[]>>] => {
-  const [todos, setTodoValues] = useState<Todo[]>([]);
-
-  const syncTodos = useCallback((todos: Todo[]) => {
-    if (todos.length) localStorage.setItem(`todos-${code}`, JSON.stringify(serializeTodos(todos)));
-    else localStorage.removeItem(`todos-${code}`);
-  }, []);
-
-  const setTodos = useCallback(
-    (newTodos: React.SetStateAction<Todo[]>) =>
-      setTodoValues(prevTodos => {
-        const actualTodos = newTodos instanceof Function ? newTodos(prevTodos) : newTodos;
-        syncTodos(actualTodos);
-        return actualTodos;
-      }),
-    []
-  );
-
-  useEffect(() => {
-    const rawTodos = localStorage.getItem(`todos-${code}`);
-    if (rawTodos !== null) setTodoValues(parseTodos(JSON.parse(rawTodos)));
-
-    return () => syncTodos(todos);
-  }, []);
-
-  return [todos, setTodos];
-};
+import { useLocalState } from './hooks';
 
 function App(): JSX.Element {
   const code = useRef(window.location.pathname.slice(1)).current;
 
-  const [todos, setTodos] = useLocallySavedTodos(code);
+  const [todos, setTodos] = useLocalState<Todo[]>(
+    `todos-${code}`,
+    [],
+    todos => JSON.stringify(serializeTodos(todos)),
+    rawTodos => parseTodos(JSON.parse(rawTodos))
+  );
   const [serverOnline, setServerOnline] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -135,20 +112,22 @@ function App(): JSX.Element {
   );
 
   return (
-    <Container fixed maxWidth="sm">
-      <NewTodo addTodo={addTodo} />
-      <List>
-        {todos.map((item, i) => (
-          <TodoItem
-            key={i}
-            todo={item}
-            onUpdate={updateTodo}
-            onDelete={deleteTodo}
-            onToggle={toggleCompleted}
-          />
-        ))}
-      </List>
-    </Container>
+    <ThemeToggler>
+      <Container fixed maxWidth="sm">
+        <NewTodo addTodo={addTodo} />
+        <List>
+          {todos.map((item, i) => (
+            <TodoItem
+              key={i}
+              todo={item}
+              onUpdate={updateTodo}
+              onDelete={deleteTodo}
+              onToggle={toggleCompleted}
+            />
+          ))}
+        </List>
+      </Container>
+    </ThemeToggler>
   );
 }
 
