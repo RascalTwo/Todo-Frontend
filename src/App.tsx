@@ -29,17 +29,23 @@ const useWSAPI = (
   connect: boolean,
   onCreate: (todo: Todo) => void,
   onUpdate: (updatedTodo: Todo) => void,
-  onDelete: (created: Date) => void
+  onDelete: (created: Date) => void,
+  setRealtime: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
+    if (!connect) return;
     const ws = new WebSocket(`ws://${window.location.host}/ws/${code}`, [Date.now().toString()]);
     ws.addEventListener('open', () => {
       wsRef.current = ws;
+      setRealtime(true);
     });
     ws.addEventListener('close', e => {
-      if (wsRef.current?.protocol === (e.target as WebSocket).protocol) wsRef.current = null;
+      if (wsRef.current?.protocol === (e.target as WebSocket).protocol) {
+        wsRef.current = null;
+        setRealtime(false);
+      }
     });
 
     ws.addEventListener('message', e => {
@@ -61,7 +67,10 @@ const useWSAPI = (
       }
     });
 
-    return () => ws.close();
+    return () => {
+      wsRef.current = null;
+      ws.close();
+    };
   }, [code, connect]);
 
   const sendAction = (action: string, payload: Todo | Date) => {
@@ -76,7 +85,11 @@ const useWSAPI = (
   return { ws: wsRef.current, createTodo, updateTodo, deleteTodo };
 };
 
-const useTodos = (code: string, serverOnline: boolean) => {
+const useTodos = (
+  code: string,
+  serverOnline: boolean,
+  setRealtime: React.Dispatch<React.SetStateAction<boolean>>
+) => {
   const [todos, setTodos] = useLocalState<Todo[]>(
     `todos-${code}`,
     [],
@@ -104,7 +117,8 @@ const useTodos = (code: string, serverOnline: boolean) => {
           todos,
           todos.findIndex(todo => todo.created.valueOf() === created.valueOf())
         )
-      )
+      ),
+    setRealtime
   );
 
   useEffect(() => {
@@ -243,14 +257,16 @@ function App(): JSX.Element {
   const [code, setCode] = useCode();
   useTitle((code: string) => 'Todos - ' + (code ? `#${code}` : 'Local'), [code]);
   const serverOnline = useServerOnline();
+  const [realtime, setRealtime] = useState(false);
   const { todos, addTodo, updateTodo, deleteTodo, toggleCompleted } = useTodos(
     code,
-    !!serverOnline
+    !!serverOnline,
+    setRealtime
   );
 
   return (
     <ThemeToggler>
-      <SyncIndicator code={code} serverOnline={!!serverOnline} />
+      <SyncIndicator code={code} serverOnline={!!serverOnline} realtime={realtime} />
       <Container fixed maxWidth="sm">
         <VisitListCode code={code} setCode={setCode} />
         <NewTodo onSubmission={addTodo} />
