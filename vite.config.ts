@@ -7,7 +7,8 @@ export default defineConfig({
   plugins: [eslintPlugin({ include: 'src/**/*.{ts,js,tsx,jsx}'}), reactRefresh()],
   server: {
     proxy: {
-      '/api': 'http://localhost:5000/'
+      '/api': 'http://localhost:5000/',
+      '/ws': 'ws://localhost:5000/'
     }
   }
 });

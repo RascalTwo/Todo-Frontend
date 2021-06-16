@@ -1,4 +1,4 @@
-import React, { DependencyList, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { DependencyList, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Container, List } from '@material-ui/core';
 
 import NewTodo from './components/NewTodo';
@@ -8,7 +8,7 @@ import VisitListCode from './components/VisitListCode';
 
 import { serializeTodos, parseTodos } from './todo';
 
-import { Todo } from './types';
+import { LocalTodo, Todo } from './types';
 import * as API from './API';
 import { useLocalState } from './hooks';
 import SyncIndicator from './components/SyncIndicator';
@@ -24,6 +24,58 @@ const removeAtIndex = <T extends any>(array: T[], index: number): T[] => [
   ...array.slice(index + 1)
 ];
 
+const useWSAPI = (
+  code: string,
+  connect: boolean,
+  onCreate: (todo: Todo) => void,
+  onUpdate: (updatedTodo: Todo) => void,
+  onDelete: (created: Date) => void
+) => {
+  const wsRef = useRef<WebSocket | null>(null);
+
+  useEffect(() => {
+    const ws = new WebSocket(`ws://${window.location.host}/ws/${code}`, [Date.now().toString()]);
+    ws.addEventListener('open', () => {
+      wsRef.current = ws;
+    });
+    ws.addEventListener('close', e => {
+      if (wsRef.current?.protocol === (e.target as WebSocket).protocol) wsRef.current = null;
+    });
+
+    ws.addEventListener('message', e => {
+      const [action, payload]: ['create' | 'update' | 'delete' | 'error', LocalTodo | number] =
+        JSON.parse(e.data);
+      switch (action) {
+        case 'create':
+          onCreate(parseTodos([payload as LocalTodo])[0]);
+          break;
+        case 'update':
+          onUpdate(parseTodos([payload as LocalTodo])[0]);
+          break;
+        case 'delete':
+          onDelete(new Date(payload as number));
+          break;
+        case 'error':
+          console.error('WS Error:', payload);
+          break;
+      }
+    });
+
+    return () => ws.close();
+  }, [code, connect]);
+
+  const sendAction = (action: string, payload: Todo | Date) => {
+    const rawPayload = payload instanceof Date ? payload.getTime() : serializeTodos([payload])[0];
+    wsRef.current?.send(JSON.stringify([action, rawPayload]));
+  };
+
+  const createTodo = (todo: Todo) => sendAction('create', todo);
+  const updateTodo = (todo: Todo) => sendAction('update', todo);
+  const deleteTodo = (created: Date) => sendAction('delete', created);
+
+  return { ws: wsRef.current, createTodo, updateTodo, deleteTodo };
+};
+
 const useTodos = (code: string, serverOnline: boolean) => {
   const [todos, setTodos] = useLocalState<Todo[]>(
     `todos-${code}`,
@@ -33,6 +85,27 @@ const useTodos = (code: string, serverOnline: boolean) => {
   );
 
   const isLocal = useMemo(() => !code, [code]);
+
+  const WSAPI = useWSAPI(
+    code,
+    serverOnline && !isLocal,
+    todo => setTodos(todos => [...todos, todo]),
+    updatedTodo =>
+      setTodos(todos =>
+        replaceAtIndex(
+          todos,
+          todos.findIndex(todo => todo.created.valueOf() === updatedTodo.created.valueOf()),
+          updatedTodo
+        )
+      ),
+    created =>
+      setTodos(todos =>
+        removeAtIndex(
+          todos,
+          todos.findIndex(todo => todo.created.valueOf() === created.valueOf())
+        )
+      )
+  );
 
   useEffect(() => {
     if (!serverOnline || isLocal) return;
@@ -52,14 +125,16 @@ const useTodos = (code: string, serverOnline: boolean) => {
           const todo = { created: new Date(), updated: new Date(), text: newText, completed: null };
           if (!serverOnline || isLocal) return [...todos, todo];
 
-          API.createTodo(code, todo)
-            .then(rawTodo => parseTodos([rawTodo])[0])
-            .then(todo => setTodos([...todos, todo]));
+          if (WSAPI.ws) WSAPI.createTodo(todo);
+          else
+            API.createTodo(code, todo)
+              .then(rawTodo => parseTodos([rawTodo])[0])
+              .then(todo => setTodos([...todos, todo]));
 
           return todos;
         })
       ),
-    [isLocal, code, setTodos, serverOnline, API.createTodo]
+    [WSAPI.ws, isLocal, code, setTodos, serverOnline, API.createTodo]
   );
 
   const updateTodo = useCallback(
@@ -67,7 +142,7 @@ const useTodos = (code: string, serverOnline: boolean) => {
       new Promise<void>((resolve, reject) => {
         return setTodos(todos => {
           const existingTodo = todos.find(
-            todo => created !== todo.created && todo.text === newText
+            todo => created.valueOf() !== todo.created.valueOf() && todo.text === newText
           );
           if (existingTodo) {
             reject(Error('TODO already exists'));
@@ -76,7 +151,9 @@ const useTodos = (code: string, serverOnline: boolean) => {
           resolve();
           const updated = new Date();
 
-          const updatingIndex = todos.findIndex(todo => todo.created === created);
+          const updatingIndex = todos.findIndex(
+            todo => todo.created.valueOf() === created.valueOf()
+          );
           const updatedTodo = {
             ...todos[updatingIndex],
             updated,
@@ -84,35 +161,37 @@ const useTodos = (code: string, serverOnline: boolean) => {
           };
           if (!serverOnline || isLocal) return replaceAtIndex(todos, updatingIndex, updatedTodo);
 
-          API.updateTodo(code, updatedTodo)
-            .then(rawTodo => parseTodos([rawTodo])[0])
-            .then(todo => setTodos(replaceAtIndex(todos, updatingIndex, todo)));
+          if (WSAPI.ws) WSAPI.updateTodo(updatedTodo);
+          else
+            API.updateTodo(code, updatedTodo)
+              .then(rawTodo => parseTodos([rawTodo])[0])
+              .then(todo => setTodos(replaceAtIndex(todos, updatingIndex, todo)));
 
           return todos;
         });
       }),
-    [isLocal, code, setTodos, serverOnline, API.updateTodo]
+    [WSAPI.ws, isLocal, code, setTodos, serverOnline, API.updateTodo]
   );
 
   const deleteTodo = useCallback(
     (created: Date) =>
       setTodos(todos => {
-        const removingIndex = todos.findIndex(todo => todo.created === created);
+        const removingIndex = todos.findIndex(todo => todo.created.valueOf() === created.valueOf());
         if (!serverOnline || isLocal) return removeAtIndex(todos, removingIndex);
 
-        API.deleteTodo(code, todos[removingIndex].created).then(() =>
-          setTodos(removeAtIndex(todos, removingIndex))
-        );
+        if (WSAPI.ws) WSAPI.deleteTodo(created);
+        else
+          API.deleteTodo(code, created).then(() => setTodos(removeAtIndex(todos, removingIndex)));
 
         return todos;
       }),
-    [isLocal, code, setTodos, serverOnline, API.deleteTodo]
+    [WSAPI.ws, isLocal, code, setTodos, serverOnline, API.deleteTodo]
   );
 
   const toggleCompleted = useCallback(
     created =>
       setTodos(todos => {
-        const updatingIndex = todos.findIndex(todo => todo.created === created);
+        const updatingIndex = todos.findIndex(todo => todo.created.valueOf() === created.valueOf());
         const updatedTodo = {
           ...todos[updatingIndex],
           completed: todos[updatingIndex].completed ? null : new Date()
@@ -125,7 +204,7 @@ const useTodos = (code: string, serverOnline: boolean) => {
 
         return todos;
       }),
-    [isLocal, code, setTodos, serverOnline, API.updateTodo]
+    [WSAPI.ws, isLocal, code, setTodos, serverOnline, API.updateTodo]
   );
 
   return { todos, addTodo, updateTodo, deleteTodo, toggleCompleted };
