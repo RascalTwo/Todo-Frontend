@@ -19,7 +19,8 @@
     "strictNullChecks": true,
     "alwaysStrict": true,
     "importHelpers": true,
-    "removeComments": true
+    "removeComments": true,
+    "incremental": true,
   },
   "include": ["./src"],
   "exclude": ["./node_modules/"]
