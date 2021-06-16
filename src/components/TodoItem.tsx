@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import {
   makeStyles,
@@ -41,10 +41,7 @@ export default React.memo(
     const [editing, setEditing] = useState(false);
     const [error, setError] = useState<string | undefined>();
 
-    const textField = useRef<HTMLDivElement | null>(null);
-
     useEffect(() => {
-      if (editing && textField.current) textField.current.querySelector('input')?.focus();
       if (!editing && error) setError(undefined);
     }, [editing]);
 
@@ -91,7 +88,7 @@ export default React.memo(
         <form onSubmit={handleUpdate}>
           {itemIcon}
           <TextField
-            ref={textField}
+            autoFocus
             error={!!error}
             helperText={error}
             placeholder="Item"
