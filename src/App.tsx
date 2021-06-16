@@ -1,9 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Container, List } from '@material-ui/core';
 
 import NewTodo from './components/NewTodo';
 import TodoItem from './components/TodoItem';
 import ThemeToggler from './components/ThemeToggler';
+import VisitListCode from './components/VisitListCode';
 
 import { serializeTodos, parseTodos } from './todo';
 
@@ -11,25 +12,18 @@ import { Todo } from './types';
 import * as API from './API';
 import { useLocalState } from './hooks';
 
-function App(): JSX.Element {
-  const code = useRef(window.location.pathname.slice(1)).current;
-
+const useTodos = (code: string, serverOnline: boolean | null) => {
   const [todos, setTodos] = useLocalState<Todo[]>(
     `todos-${code}`,
     [],
     todos => JSON.stringify(serializeTodos(todos)),
     rawTodos => parseTodos(JSON.parse(rawTodos))
   );
-  const [serverOnline, setServerOnline] = useState<boolean | null>(null);
 
   useEffect(() => {
-    API.isServerOnline().then(online => setServerOnline(Boolean(code && online)));
-  }, []);
-
-  useEffect(() => {
-    if (!serverOnline) return;
+    if (!serverOnline || !code) return;
     API.readTodos(code).then(parseTodos).then(setTodos);
-  }, [serverOnline]);
+  }, [code, serverOnline]);
 
   const addTodo = useCallback(
     (newText: string) =>
@@ -51,7 +45,7 @@ function App(): JSX.Element {
           return todos;
         })
       ),
-    [setTodos, serverOnline, API.createTodo]
+    [code, setTodos, serverOnline, API.createTodo]
   );
 
   const updateTodo = useCallback(
@@ -80,7 +74,7 @@ function App(): JSX.Element {
           });
         });
       }),
-    [setTodos, serverOnline, API.updateTodo]
+    [code, setTodos, serverOnline, API.updateTodo]
   );
 
   const deleteTodo = useCallback(
@@ -92,7 +86,7 @@ function App(): JSX.Element {
           return false;
         })
       ),
-    [setTodos, serverOnline, API.deleteTodo]
+    [code, setTodos, serverOnline, API.deleteTodo]
   );
 
   const toggleCompleted = useCallback(
@@ -108,13 +102,46 @@ function App(): JSX.Element {
           return updatedTodo;
         })
       ),
-    [setTodos, serverOnline, API.updateTodo]
+    [code, setTodos, serverOnline, API.updateTodo]
   );
+
+  return { todos, addTodo, updateTodo, deleteTodo, toggleCompleted };
+};
+
+const useServerOnline = (code: string) => {
+  const [serverOnline, setServerOnline] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (!code) return setServerOnline(false);
+    API.isServerOnline().then(setServerOnline);
+  }, [code]);
+
+  return serverOnline;
+};
+
+const useCode = (): [string, React.Dispatch<React.SetStateAction<string>>] => {
+  const [code, setCodeValue] = useState(window.location.pathname.slice(1));
+
+  const setCode: React.Dispatch<React.SetStateAction<string>> = action =>
+    setCodeValue(code => {
+      const newCode = action instanceof Function ? action(code) : action;
+      history.pushState({}, '', '/' + newCode);
+      return newCode;
+    });
+
+  return [code, setCode];
+};
+
+function App(): JSX.Element {
+  const [code, setCode] = useCode();
+  const serverOnline = useServerOnline(code);
+  const { todos, addTodo, updateTodo, deleteTodo, toggleCompleted } = useTodos(code, serverOnline);
 
   return (
     <ThemeToggler>
       <Container fixed maxWidth="sm">
-        <NewTodo addTodo={addTodo} />
+        <VisitListCode code={code} setCode={setCode} />
+        <NewTodo onSubmission={addTodo} />
         <List>
           {todos.map((item, i) => (
             <TodoItem
