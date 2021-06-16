@@ -32,6 +32,7 @@ const useWSAPI = (
   onDelete: (created: Date) => void,
   setRealtime: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
+  const [memberCount, setMemberCount] = useState(0);
   const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
@@ -49,8 +50,10 @@ const useWSAPI = (
     });
 
     ws.addEventListener('message', e => {
-      const [action, payload]: ['create' | 'update' | 'delete' | 'error', LocalTodo | number] =
-        JSON.parse(e.data);
+      const [action, payload]: [
+        'create' | 'update' | 'delete' | 'memberCount' | 'error',
+        LocalTodo | number
+      ] = JSON.parse(e.data);
       switch (action) {
         case 'create':
           onCreate(parseTodos([payload as LocalTodo])[0]);
@@ -60,6 +63,9 @@ const useWSAPI = (
           break;
         case 'delete':
           onDelete(new Date(payload as number));
+          break;
+        case 'memberCount':
+          setMemberCount(payload as number);
           break;
         case 'error':
           console.error('WS Error:', payload);
@@ -80,7 +86,7 @@ const useWSAPI = (
   const updateTodo = (changes: TodoChanges) => sendAction('update', changes);
   const deleteTodo = (created: Date) => sendAction('delete', created.getTime());
 
-  return { ws: wsRef.current, createTodo, updateTodo, deleteTodo };
+  return { ws: wsRef.current, createTodo, updateTodo, deleteTodo, memberCount };
 };
 
 const useTodos = (
@@ -223,7 +229,14 @@ const useTodos = (
     [WSAPI.ws, isLocal, code, setTodos, serverOnline, API.updateTodo]
   );
 
-  return { todos, addTodo, updateTodo, deleteTodo, toggleCompleted };
+  return {
+    todos,
+    addTodo,
+    updateTodo,
+    deleteTodo,
+    toggleCompleted,
+    realtimeMemberCount: WSAPI.memberCount
+  };
 };
 
 const useServerOnline = () => {
@@ -260,7 +273,7 @@ function App(): JSX.Element {
   useTitle((code: string) => 'Todos - ' + (code ? `#${code}` : 'Local'), [code]);
   const serverOnline = useServerOnline();
   const [realtime, setRealtime] = useState(false);
-  const { todos, addTodo, updateTodo, deleteTodo, toggleCompleted } = useTodos(
+  const { todos, addTodo, updateTodo, deleteTodo, toggleCompleted, realtimeMemberCount } = useTodos(
     code,
     !!serverOnline,
     setRealtime
@@ -268,7 +281,12 @@ function App(): JSX.Element {
 
   return (
     <ThemeToggler>
-      <SyncIndicator code={code} serverOnline={!!serverOnline} realtime={realtime} />
+      <SyncIndicator
+        code={code}
+        serverOnline={!!serverOnline}
+        realtime={realtime}
+        realtimeMemberCount={realtimeMemberCount}
+      />
       <Container fixed maxWidth="sm">
         <VisitListCode code={code} setCode={setCode} />
         <NewTodo onSubmission={addTodo} />

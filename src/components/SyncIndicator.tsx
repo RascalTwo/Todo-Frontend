@@ -17,11 +17,13 @@ const useStyles = makeStyles({
 export default function SyncIndicator({
   code,
   serverOnline,
-  realtime
+  realtime,
+  realtimeMemberCount
 }: {
   code: string;
   serverOnline: boolean;
   realtime: boolean;
+  realtimeMemberCount: number;
 }): JSX.Element {
   const styles = useStyles();
   if (!serverOnline)
@@ -44,7 +46,10 @@ export default function SyncIndicator({
     );
 
   return (
-    <span className={styles.wrapper} title="Realtime">
+    <span
+      className={styles.wrapper}
+      title={'Realtime' + (realtimeMemberCount ? ` - with ${realtimeMemberCount} others` : '')}
+    >
       <SyncAltIcon />
     </span>
   );
