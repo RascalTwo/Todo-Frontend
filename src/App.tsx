@@ -13,6 +13,17 @@ import * as API from './API';
 import { useLocalState } from './hooks';
 import SyncIndicator from './components/SyncIndicator';
 
+const replaceAtIndex = <T extends any>(array: T[], index: number, replacement: T): T[] => [
+  ...array.slice(0, index),
+  replacement,
+  ...array.slice(index + 1)
+];
+
+const removeAtIndex = <T extends any>(array: T[], index: number): T[] => [
+  ...array.slice(0, index),
+  ...array.slice(index + 1)
+];
+
 const useTodos = (code: string, serverOnline: boolean) => {
   const [todos, setTodos] = useLocalState<Todo[]>(
     `todos-${code}`,
@@ -64,17 +75,20 @@ const useTodos = (code: string, serverOnline: boolean) => {
           }
           resolve();
           const updated = new Date();
-          return todos.map(todo => {
-            if (todo.created !== created) return todo;
 
-            const updatedTodo = {
-              ...todo,
-              updated,
-              text: newText
-            };
-            if (serverOnline && !isLocal) API.updateTodo(code, updatedTodo);
-            return updatedTodo;
-          });
+          const updatingIndex = todos.findIndex(todo => todo.created === created);
+          const updatedTodo = {
+            ...todos[updatingIndex],
+            updated,
+            text: newText
+          };
+          if (!serverOnline || isLocal) return replaceAtIndex(todos, updatingIndex, updatedTodo);
+
+          API.updateTodo(code, updatedTodo)
+            .then(rawTodo => parseTodos([rawTodo])[0])
+            .then(todo => setTodos(replaceAtIndex(todos, updatingIndex, todo)));
+
+          return todos;
         });
       }),
     [isLocal, code, setTodos, serverOnline, API.updateTodo]
@@ -82,29 +96,35 @@ const useTodos = (code: string, serverOnline: boolean) => {
 
   const deleteTodo = useCallback(
     (created: Date) =>
-      setTodos(todos =>
-        todos.filter(todo => {
-          if (todo.created !== created) return true;
-          if (serverOnline && !isLocal) API.deleteTodo(code, todo.created);
-          return false;
-        })
-      ),
+      setTodos(todos => {
+        const removingIndex = todos.findIndex(todo => todo.created === created);
+        if (!serverOnline || isLocal) return removeAtIndex(todos, removingIndex);
+
+        API.deleteTodo(code, todos[removingIndex].created).then(() =>
+          setTodos(removeAtIndex(todos, removingIndex))
+        );
+
+        return todos;
+      }),
     [isLocal, code, setTodos, serverOnline, API.deleteTodo]
   );
 
   const toggleCompleted = useCallback(
     created =>
-      setTodos(todos =>
-        todos.map(todo => {
-          if (todo.created !== created) return todo;
-          const updatedTodo = {
-            ...todo,
-            completed: todos.find(todo => todo.created === created)?.completed ? null : new Date()
-          };
-          if (serverOnline && !isLocal) API.updateTodo(code, updatedTodo);
-          return updatedTodo;
-        })
-      ),
+      setTodos(todos => {
+        const updatingIndex = todos.findIndex(todo => todo.created === created);
+        const updatedTodo = {
+          ...todos[updatingIndex],
+          completed: todos[updatingIndex].completed ? null : new Date()
+        };
+        if (!serverOnline || isLocal) return replaceAtIndex(todos, updatingIndex, updatedTodo);
+
+        API.updateTodo(code, updatedTodo)
+          .then(rawTodo => parseTodos([rawTodo])[0])
+          .then(todo => setTodos(replaceAtIndex(todos, updatingIndex, todo)));
+
+        return todos;
+      }),
     [isLocal, code, setTodos, serverOnline, API.updateTodo]
   );
 
