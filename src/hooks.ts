@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export const useLocalState = <T>(
   key: string,
@@ -6,10 +6,7 @@ export const useLocalState = <T>(
   serialize: (value: T) => string = JSON.stringify,
   deserialize: (rawValue: string) => T = JSON.parse
 ): [T, React.Dispatch<React.SetStateAction<T>>] => {
-  const [value, setStateValue] = useState(() => {
-    const localInitial = localStorage.getItem(key);
-    return localInitial === null ? initial : deserialize(localInitial);
-  });
+  const [value, setStateValue] = useState(initial);
 
   const setValue: React.Dispatch<React.SetStateAction<T>> = action =>
     setStateValue(value => {
@@ -17,6 +14,15 @@ export const useLocalState = <T>(
       localStorage.setItem(key, serialize(newValue));
       return newValue;
     });
+
+  useEffect(
+    () =>
+      setStateValue(() => {
+        const localInitial = localStorage.getItem(key);
+        return localInitial === null ? initial : deserialize(localInitial);
+      }),
+    [key]
+  );
 
   return [value, setValue];
 };
