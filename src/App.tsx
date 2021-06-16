@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { DependencyList, useCallback, useEffect, useMemo, useState } from 'react';
 import { Container, List } from '@material-ui/core';
 
 import NewTodo from './components/NewTodo';
@@ -134,8 +134,15 @@ const useCode = (): [string, React.Dispatch<React.SetStateAction<string>>] => {
   return [code, setCode];
 };
 
+const useTitle = (setter: (...deps: DependencyList) => string, deps: DependencyList) => {
+  useEffect(() => {
+    document.title = setter(...deps);
+  }, deps);
+};
+
 function App(): JSX.Element {
   const [code, setCode] = useCode();
+  useTitle((code: string) => 'Todos - ' + (code ? `#${code}` : 'Local'), [code]);
   const serverOnline = useServerOnline();
   const { todos, addTodo, updateTodo, deleteTodo, toggleCompleted } = useTodos(
     code,
