@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Container, List } from '@material-ui/core';
 
 import NewTodo from './components/NewTodo';
@@ -11,8 +11,9 @@ import { serializeTodos, parseTodos } from './todo';
 import { Todo } from './types';
 import * as API from './API';
 import { useLocalState } from './hooks';
+import SyncIndicator from './components/SyncIndicator';
 
-const useTodos = (code: string, serverOnline: boolean | null) => {
+const useTodos = (code: string, serverOnline: boolean) => {
   const [todos, setTodos] = useLocalState<Todo[]>(
     `todos-${code}`,
     [],
@@ -20,10 +21,12 @@ const useTodos = (code: string, serverOnline: boolean | null) => {
     rawTodos => parseTodos(JSON.parse(rawTodos))
   );
 
+  const isLocal = useMemo(() => !code, [code]);
+
   useEffect(() => {
-    if (!serverOnline || !code) return;
+    if (!serverOnline || isLocal) return;
     API.readTodos(code).then(parseTodos).then(setTodos);
-  }, [code, serverOnline]);
+  }, [isLocal, code, serverOnline]);
 
   const addTodo = useCallback(
     (newText: string) =>
@@ -36,7 +39,7 @@ const useTodos = (code: string, serverOnline: boolean | null) => {
           }
           resolve();
           const todo = { created: new Date(), updated: new Date(), text: newText, completed: null };
-          if (!serverOnline) return [...todos, todo];
+          if (!serverOnline || isLocal) return [...todos, todo];
 
           API.createTodo(code, todo)
             .then(rawTodo => parseTodos([rawTodo])[0])
@@ -45,7 +48,7 @@ const useTodos = (code: string, serverOnline: boolean | null) => {
           return todos;
         })
       ),
-    [code, setTodos, serverOnline, API.createTodo]
+    [isLocal, code, setTodos, serverOnline, API.createTodo]
   );
 
   const updateTodo = useCallback(
@@ -69,12 +72,12 @@ const useTodos = (code: string, serverOnline: boolean | null) => {
               updated,
               text: newText
             };
-            if (serverOnline) API.updateTodo(code, updatedTodo);
+            if (serverOnline && !isLocal) API.updateTodo(code, updatedTodo);
             return updatedTodo;
           });
         });
       }),
-    [code, setTodos, serverOnline, API.updateTodo]
+    [isLocal, code, setTodos, serverOnline, API.updateTodo]
   );
 
   const deleteTodo = useCallback(
@@ -82,11 +85,11 @@ const useTodos = (code: string, serverOnline: boolean | null) => {
       setTodos(todos =>
         todos.filter(todo => {
           if (todo.created !== created) return true;
-          if (serverOnline) API.deleteTodo(code, todo.created);
+          if (serverOnline && !isLocal) API.deleteTodo(code, todo.created);
           return false;
         })
       ),
-    [code, setTodos, serverOnline, API.deleteTodo]
+    [isLocal, code, setTodos, serverOnline, API.deleteTodo]
   );
 
   const toggleCompleted = useCallback(
@@ -98,23 +101,22 @@ const useTodos = (code: string, serverOnline: boolean | null) => {
             ...todo,
             completed: todos.find(todo => todo.created === created)?.completed ? null : new Date()
           };
-          if (serverOnline) API.updateTodo(code, updatedTodo);
+          if (serverOnline && !isLocal) API.updateTodo(code, updatedTodo);
           return updatedTodo;
         })
       ),
-    [code, setTodos, serverOnline, API.updateTodo]
+    [isLocal, code, setTodos, serverOnline, API.updateTodo]
   );
 
   return { todos, addTodo, updateTodo, deleteTodo, toggleCompleted };
 };
 
-const useServerOnline = (code: string) => {
+const useServerOnline = () => {
   const [serverOnline, setServerOnline] = useState<boolean | null>(null);
 
   useEffect(() => {
-    if (!code) return setServerOnline(false);
     API.isServerOnline().then(setServerOnline);
-  }, [code]);
+  }, []);
 
   return serverOnline;
 };
@@ -134,11 +136,15 @@ const useCode = (): [string, React.Dispatch<React.SetStateAction<string>>] => {
 
 function App(): JSX.Element {
   const [code, setCode] = useCode();
-  const serverOnline = useServerOnline(code);
-  const { todos, addTodo, updateTodo, deleteTodo, toggleCompleted } = useTodos(code, serverOnline);
+  const serverOnline = useServerOnline();
+  const { todos, addTodo, updateTodo, deleteTodo, toggleCompleted } = useTodos(
+    code,
+    !!serverOnline
+  );
 
   return (
     <ThemeToggler>
+      <SyncIndicator code={code} serverOnline={!!serverOnline} />
       <Container fixed maxWidth="sm">
         <VisitListCode code={code} setCode={setCode} />
         <NewTodo onSubmission={addTodo} />
