@@ -8,7 +8,7 @@ import VisitListCode from './components/VisitListCode';
 
 import { serializeTodos, parseTodos } from './todo';
 
-import { LocalTodo, Todo } from './types';
+import { LocalTodo, Todo, TodoChanges } from './types';
 import * as API from './API';
 import { useLocalState } from './hooks';
 import SyncIndicator from './components/SyncIndicator';
@@ -73,14 +73,12 @@ const useWSAPI = (
     };
   }, [code, connect]);
 
-  const sendAction = (action: string, payload: Todo | Date) => {
-    const rawPayload = payload instanceof Date ? payload.getTime() : serializeTodos([payload])[0];
-    wsRef.current?.send(JSON.stringify([action, rawPayload]));
-  };
+  const sendAction = (action: string, payload: any) =>
+    wsRef.current?.send(JSON.stringify([action, payload]));
 
-  const createTodo = (todo: Todo) => sendAction('create', todo);
-  const updateTodo = (todo: Todo) => sendAction('update', todo);
-  const deleteTodo = (created: Date) => sendAction('delete', created);
+  const createTodo = (text: string) => sendAction('create', text);
+  const updateTodo = (changes: TodoChanges) => sendAction('update', changes);
+  const deleteTodo = (created: Date) => sendAction('delete', created.getTime());
 
   return { ws: wsRef.current, createTodo, updateTodo, deleteTodo };
 };
@@ -139,9 +137,9 @@ const useTodos = (
           const todo = { created: new Date(), updated: new Date(), text: newText, completed: null };
           if (!serverOnline || isLocal) return [...todos, todo];
 
-          if (WSAPI.ws) WSAPI.createTodo(todo);
+          if (WSAPI.ws) WSAPI.createTodo(newText);
           else
-            API.createTodo(code, todo)
+            API.createTodo(code, newText)
               .then(rawTodo => parseTodos([rawTodo])[0])
               .then(todo => setTodos([...todos, todo]));
 
@@ -175,9 +173,9 @@ const useTodos = (
           };
           if (!serverOnline || isLocal) return replaceAtIndex(todos, updatingIndex, updatedTodo);
 
-          if (WSAPI.ws) WSAPI.updateTodo(updatedTodo);
+          if (WSAPI.ws) WSAPI.updateTodo({ created: created.getTime(), text: newText });
           else
-            API.updateTodo(code, updatedTodo)
+            API.updateTodo(code, { created: created.getTime(), text: newText })
               .then(rawTodo => parseTodos([rawTodo])[0])
               .then(todo => setTodos(replaceAtIndex(todos, updatingIndex, todo)));
 
@@ -203,18 +201,22 @@ const useTodos = (
   );
 
   const toggleCompleted = useCallback(
-    created =>
+    (created: Date) =>
       setTodos(todos => {
         const updatingIndex = todos.findIndex(todo => todo.created.valueOf() === created.valueOf());
-        const updatedTodo = {
-          ...todos[updatingIndex],
-          completed: todos[updatingIndex].completed ? null : new Date()
-        };
-        if (!serverOnline || isLocal) return replaceAtIndex(todos, updatingIndex, updatedTodo);
+        const completed = todos[updatingIndex].completed ? null : new Date();
+        if (!serverOnline || isLocal)
+          return replaceAtIndex(todos, updatingIndex, { ...todos[updatingIndex], completed });
 
-        API.updateTodo(code, updatedTodo)
-          .then(rawTodo => parseTodos([rawTodo])[0])
-          .then(todo => setTodos(replaceAtIndex(todos, updatingIndex, todo)));
+        if (WSAPI.ws)
+          WSAPI.updateTodo({ created: created.getTime(), completed: completed?.getTime() || null });
+        else
+          API.updateTodo(code, {
+            created: created.getTime(),
+            completed: completed?.getTime() || null
+          })
+            .then(rawTodo => parseTodos([rawTodo])[0])
+            .then(todo => setTodos(replaceAtIndex(todos, updatingIndex, todo)));
 
         return todos;
       }),
