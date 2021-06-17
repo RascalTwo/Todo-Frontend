@@ -185,12 +185,14 @@ const useServerOnline = () => {
 };
 
 const useCode = (): [string, React.Dispatch<React.SetStateAction<string>>] => {
-  const [code, setCodeValue] = useState(window.location.pathname.slice(1));
+  const [code, setCodeValue] = useState(
+    window.location.pathname.split(import.meta.env.BASE_URL).slice(1).join('/')
+  );
 
   const setCode: React.Dispatch<React.SetStateAction<string>> = action =>
     setCodeValue(code => {
       const newCode = action instanceof Function ? action(code) : action;
-      history.pushState({}, '', '/' + newCode);
+      history.pushState({}, '', import.meta.env.BASE_URL + newCode);
       return newCode;
     });
 
