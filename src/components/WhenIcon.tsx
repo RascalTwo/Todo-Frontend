@@ -11,7 +11,7 @@ const useStyles = makeStyles({
 });
 
 export default React.memo(
-  function WhenIcon({ created, updated }: { created: Date; updated: Date }): JSX.Element {
+  function WhenIcon({ created, updated }: { created: Date; updated: Date }) {
     const styles = useStyles();
 
     const title = useMemo(

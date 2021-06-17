@@ -22,7 +22,7 @@ const useThemeToggle = (initial: PaletteType): [Theme, () => void] => {
   ];
 };
 
-export default function ThemeToggler({ children }: { children: React.ReactNode }): JSX.Element {
+export default function ThemeToggler({ children }: { children: React.ReactNode }) {
   const [theme, toggleTheme] = useThemeToggle(
     window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   );

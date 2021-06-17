@@ -203,7 +203,7 @@ const useTitle = (setter: (...deps: DependencyList) => string, deps: DependencyL
   }, deps);
 };
 
-function App(): JSX.Element {
+function App() {
   const [code, setCode] = useCode();
   useTitle((code: string) => 'Todos - ' + (code ? `#${code}` : 'Local'), [code]);
   const serverOnline = useServerOnline();

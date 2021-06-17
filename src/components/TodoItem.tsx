@@ -36,7 +36,7 @@ export default React.memo(
     onDelete: (created: Date) => void;
     onUpdate: (created: Date, text: string) => Promise<void>;
     onToggle: (created: Date) => void;
-  }): JSX.Element {
+  }) {
     const styles = useTodoItemStyles();
     const [editing, setEditing] = useState(false);
     const [error, setError] = useState<string | undefined>();

@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { parseTodos } from './todo';
 import { LocalTodo, Todo, TodoChanges } from './types';
 
-export const isServerOnline = (): Promise<boolean> => fetch('/api').then(r => r.ok);
-
 const API_HOST = import.meta.env['VITE_SERVER_HOST'] || window.location.host;
+
+export const isServerOnline = (): Promise<boolean> =>
+  fetch(`http://${API_HOST}/api`).then(r => r.ok);
 
 export const readTodos = (code: string): Promise<LocalTodo[]> =>
   fetch(`http://${API_HOST}/api/${code}`).then(r => r.json());

@@ -32,7 +32,7 @@ export default function VisitListCode({
 }: {
   code: string;
   setCode: React.Dispatch<React.SetStateAction<string>>;
-}): JSX.Element {
+}) {
   const styles = useStyles();
   const [editing, setEditing] = useState(false);
 

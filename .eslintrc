@@ -37,6 +37,7 @@
 			{
 				"max": 1
 			}
-		]
+		],
+		"@typescript-eslint/explicit-module-boundary-types": [0]
 	}
 }

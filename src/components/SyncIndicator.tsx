@@ -24,7 +24,7 @@ export default function SyncIndicator({
   serverOnline: boolean;
   realtime: boolean;
   realtimeMemberCount: number;
-}): JSX.Element {
+}) {
   const styles = useStyles();
   if (!serverOnline)
     return (

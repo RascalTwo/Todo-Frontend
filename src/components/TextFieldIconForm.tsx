@@ -38,7 +38,7 @@ export default function TextFieldIconForm({
   IconButtonProps,
   resetOnSuccess = true,
   ...props
-}: TextFieldIconFormProps): JSX.Element {
+}: TextFieldIconFormProps) {
   const styles = useStyles();
   const [error, setError] = useState<string | undefined>();
   return (

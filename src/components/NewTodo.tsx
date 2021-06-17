@@ -3,7 +3,7 @@ import TextFieldIconForm, { TextFieldIconFormProps } from './TextFieldIconForm';
 
 import AddIcon from '@material-ui/icons/Add';
 
-export default function NewTodo(props: Omit<TextFieldIconFormProps, 'children'>): JSX.Element {
+export default function NewTodo(props: Omit<TextFieldIconFormProps, 'children'>) {
   return (
     <TextFieldIconForm
       placeholder="New Todo"
