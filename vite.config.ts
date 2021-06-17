@@ -11,5 +11,8 @@ export default defineConfig({
       '/ws': 'ws://localhost:5000/'
     }
   },
-  base: './'
+  base: './',
+  build: {
+    outDir: 'public'
+  },
 });
