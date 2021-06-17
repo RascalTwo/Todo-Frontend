@@ -1,0 +1,27 @@
+image: node:current
+
+cache:
+  paths:
+    - node_modules/
+    - .yarn
+
+before_script:
+  - apt-get update -qq && apt-get install
+
+stages:
+  - deploy
+
+pages:
+  stage: deploy
+  only:
+    - web
+  variables:
+    VITE_SERVER_HOST: $VITE_SERVER_HOST
+    VITE_HASH_ROUTING: 'true'
+  script:
+    - yarn config set cache-folder .yarn
+    - yarn install
+    - yarn run build
+  artifacts:
+    paths:
+    - public

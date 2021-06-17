@@ -1,0 +1,32 @@
+name: Deploy Pages
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: github-pages
+    steps:
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: '14'
+      - uses: actions/checkout@v2.3.4
+      - name: Cache Gradle packages
+        uses: actions/cache@v2.1.6
+        with:
+          path: ~/.npm/
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+      - name: Install and Build
+        run: |
+          npm install
+          npm run build
+        env:
+          VITE_SERVER_HOST: ${{ secrets.VITE_SERVER_HOST }}
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: gh-pages
+          folder: public
