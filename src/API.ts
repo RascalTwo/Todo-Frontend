@@ -3,28 +3,29 @@ import { parseTodos } from './todo';
 import { LocalTodo, Todo, TodoChanges } from './types';
 
 const API_HOST = import.meta.env['VITE_SERVER_HOST'] || window.location.host;
+const IS_SECURE = window.location.protocol.includes('https');
+const REST_PREFIX = `${window.location.protocol}//${API_HOST}`;
 
-export const isServerOnline = (): Promise<boolean> =>
-  fetch(`http://${API_HOST}/api`).then(r => r.ok);
+export const isServerOnline = (): Promise<boolean> => fetch(`${REST_PREFIX}/api`).then(r => r.ok);
 
 export const readTodos = (code: string): Promise<LocalTodo[]> =>
-  fetch(`http://${API_HOST}/api/${code}`).then(r => r.json());
+  fetch(`${REST_PREFIX}/api/${code}`).then(r => r.json());
 
 export const createTodo = (code: string, text: string): Promise<LocalTodo> =>
-  fetch(`http://${API_HOST}/api/${code}`, {
+  fetch(`${REST_PREFIX}/api/${code}`, {
     method: 'POST',
     body: text
   }).then(r => r.json());
 
 export const updateTodo = (code: string, changes: TodoChanges): Promise<LocalTodo> =>
-  fetch(`http://${API_HOST}/api/${code}`, {
+  fetch(`${REST_PREFIX}/api/${code}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(changes)
   }).then(r => r.json());
 
 export const deleteTodo = (code: string, created: Date): Promise<void> =>
-  fetch(`http://${API_HOST}/api/${code}/${created.getTime()}`, {
+  fetch(`${REST_PREFIX}/api/${code}/${created.getTime()}`, {
     method: 'DELETE'
   }).then(() => undefined);
 
@@ -41,7 +42,9 @@ export const useWSAPI = (
 
   useEffect(() => {
     if (!connect) return;
-    const ws = new WebSocket(`ws://${API_HOST}/ws/${code}`, [Date.now().toString()]);
+    const ws = new WebSocket(`ws${IS_SECURE ? 's' : ''}://${API_HOST}/ws/${code}`, [
+      Date.now().toString()
+    ]);
     ws.addEventListener('open', () => {
       wsRef.current = ws;
       setRealtime(true);
