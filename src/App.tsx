@@ -1,4 +1,4 @@
-import React, { DependencyList, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { DependencyList, useCallback, useEffect, useMemo, useState } from 'react';
 import { Container, List } from '@material-ui/core';
 
 import NewTodo from './components/NewTodo';
@@ -8,7 +8,7 @@ import VisitListCode from './components/VisitListCode';
 
 import { serializeTodos, parseTodos } from './todo';
 
-import { LocalTodo, Todo, TodoChanges } from './types';
+import { Todo } from './types';
 import * as API from './API';
 import { useLocalState } from './hooks';
 import SyncIndicator from './components/SyncIndicator';
@@ -24,71 +24,6 @@ const removeAtIndex = <T extends any>(array: T[], index: number): T[] => [
   ...array.slice(index + 1)
 ];
 
-const useWSAPI = (
-  code: string,
-  connect: boolean,
-  onCreate: (todo: Todo) => void,
-  onUpdate: (updatedTodo: Todo) => void,
-  onDelete: (created: Date) => void,
-  setRealtime: React.Dispatch<React.SetStateAction<boolean>>
-) => {
-  const [memberCount, setMemberCount] = useState(0);
-  const wsRef = useRef<WebSocket | null>(null);
-
-  useEffect(() => {
-    if (!connect) return;
-    const ws = new WebSocket(`ws://${window.location.host}/ws/${code}`, [Date.now().toString()]);
-    ws.addEventListener('open', () => {
-      wsRef.current = ws;
-      setRealtime(true);
-    });
-    ws.addEventListener('close', e => {
-      if (wsRef.current?.protocol === (e.target as WebSocket).protocol) {
-        wsRef.current = null;
-        setRealtime(false);
-      }
-    });
-
-    ws.addEventListener('message', e => {
-      const [action, payload]: [
-        'create' | 'update' | 'delete' | 'memberCount' | 'error',
-        LocalTodo | number
-      ] = JSON.parse(e.data);
-      switch (action) {
-        case 'create':
-          onCreate(parseTodos([payload as LocalTodo])[0]);
-          break;
-        case 'update':
-          onUpdate(parseTodos([payload as LocalTodo])[0]);
-          break;
-        case 'delete':
-          onDelete(new Date(payload as number));
-          break;
-        case 'memberCount':
-          setMemberCount(payload as number);
-          break;
-        case 'error':
-          console.error('WS Error:', payload);
-          break;
-      }
-    });
-
-    return () => {
-      wsRef.current = null;
-      ws.close();
-    };
-  }, [code, connect]);
-
-  const sendAction = (action: string, payload: any) =>
-    wsRef.current?.send(JSON.stringify([action, payload]));
-
-  const createTodo = (text: string) => sendAction('create', text);
-  const updateTodo = (changes: TodoChanges) => sendAction('update', changes);
-  const deleteTodo = (created: Date) => sendAction('delete', created.getTime());
-
-  return { ws: wsRef.current, createTodo, updateTodo, deleteTodo, memberCount };
-};
-
 const useTodos = (
   code: string,
   serverOnline: boolean,
@@ -103,7 +38,7 @@ const useTodos = (
 
   const isLocal = useMemo(() => !code, [code]);
 
-  const WSAPI = useWSAPI(
+  const WSAPI = API.useWSAPI(
     code,
     serverOnline && !isLocal,
     todo => setTodos(todos => [...todos, todo]),

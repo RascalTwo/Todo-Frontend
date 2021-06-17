@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "@material-ui/types": "^5.1.0",
+    "@types/node": "^15.12.2",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@typescript-eslint/eslint-plugin": "^4.26.1",
