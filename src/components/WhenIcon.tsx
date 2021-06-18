@@ -11,15 +11,31 @@ const useStyles = makeStyles({
 });
 
 export default React.memo(
-  function WhenIcon({ created, updated }: { created: Date; updated: Date | null }) {
+  function WhenIcon({
+    created,
+    updated,
+    completed
+  }: {
+    created: Date;
+    updated: Date | null;
+    completed: Date | null;
+  }) {
     const styles = useStyles();
 
     const title = useMemo(
       () =>
-        updated && created.getTime() !== updated?.getTime()
-          ? `Created  ${created.toLocaleString()}\nUpdated ${updated.toLocaleString()}`
-          : created.toLocaleString(),
-      [created, updated]
+        [
+          ['Created', created],
+          ['Updated', updated],
+          ['Completed', completed]
+        ]
+          .reduce(
+            (lines, [title, date]) =>
+              date === null ? lines : [...lines, `${title} ${date.toLocaleString()}`],
+            []
+          )
+          .join('\n'),
+      [created, updated, completed]
     );
 
     return (

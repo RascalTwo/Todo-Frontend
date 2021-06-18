@@ -57,8 +57,8 @@ export default React.memo(
     );
 
     const whenText = useMemo(
-      () => <WhenIcon created={todo.created} updated={todo.updated} />,
-      [todo.created, todo.updated]
+      () => <WhenIcon created={todo.created} updated={todo.updated} completed={todo.completed} />,
+      [todo.created, todo.updated, todo.completed]
     );
 
     const enableEditing = useCallback(() => setEditing(true), [setEditing]);
