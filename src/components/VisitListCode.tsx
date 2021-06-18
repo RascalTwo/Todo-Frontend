@@ -56,7 +56,11 @@ export default function VisitListCode({
       ) : (
         <Typography className={styles.code}>{code}</Typography>
       )}
-      <IconButton className={styles.button} onClick={() => setEditing(editing => !editing)}>
+      <IconButton
+        className={styles.button}
+        onClick={() => setEditing(editing => !editing)}
+        title={editing ? 'Cancel' : 'Edit List Code'}
+      >
         {editing ? <Cancel /> : <Edit />}
       </IconButton>
     </Paper>
