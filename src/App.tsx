@@ -186,13 +186,23 @@ const useServerOnline = () => {
 
 const useCode = (): [string, React.Dispatch<React.SetStateAction<string>>] => {
   const [code, setCodeValue] = useState(
-    window.location.pathname.split(import.meta.env.BASE_URL).slice(1).join('/')
+    import.meta.env.VITE_HASH_ROUTING
+      ? window.location.hash.slice(1)
+      : window.location.pathname
+          .split(import.meta.env.BASE_URL)
+          .slice(1)
+          .join('/')
   );
 
   const setCode: React.Dispatch<React.SetStateAction<string>> = action =>
     setCodeValue(code => {
       const newCode = action instanceof Function ? action(code) : action;
-      history.pushState({}, '', import.meta.env.BASE_URL + newCode);
+
+      history.pushState(
+        {},
+        '',
+        import.meta.env.BASE_URL + (import.meta.env.VITE_HASH_ROUTING ? '#' : '') + newCode
+      );
       return newCode;
     });
 
