@@ -1,13 +1,13 @@
 export type Todo = {
   created: Date;
-  updated: Date;
+  updated: Date | null;
   text: string;
   completed: Date | null;
 };
 
 export type LocalTodo = {
   created: number;
-  updated: number;
+  updated: number | null;
   text: string;
   completed: number | null;
 };

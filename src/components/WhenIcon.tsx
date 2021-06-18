@@ -11,12 +11,12 @@ const useStyles = makeStyles({
 });
 
 export default React.memo(
-  function WhenIcon({ created, updated }: { created: Date; updated: Date }) {
+  function WhenIcon({ created, updated }: { created: Date; updated: Date | null }) {
     const styles = useStyles();
 
     const title = useMemo(
       () =>
-        created.getTime() !== updated.getTime()
+        updated && created.getTime() !== updated?.getTime()
           ? `Created  ${created.toLocaleString()}\nUpdated ${updated.toLocaleString()}`
           : created.toLocaleString(),
       [created, updated]
