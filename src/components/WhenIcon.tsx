@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { makeStyles } from '@material-ui/core';
+import React from 'react';
+import { makeStyles, Tooltip } from '@material-ui/core';
 
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
 
@@ -7,6 +7,11 @@ const useStyles = makeStyles({
   wrapper: {
     display: 'inline-flex',
     verticalAlign: 'middle'
+  },
+  tooltipText: {
+    display: 'grid',
+    gridTemplateColumns: 'auto auto',
+    gap: '0 0.5em'
   }
 });
 
@@ -22,26 +27,31 @@ export default React.memo(
   }) {
     const styles = useStyles();
 
-    const title = useMemo(
-      () =>
-        [
-          ['Created', created],
-          ['Updated', updated],
-          ['Completed', completed]
-        ]
-          .reduce(
-            (lines, [title, date]) =>
-              date === null ? lines : [...lines, `${title} ${date.toLocaleString()}`],
-            []
-          )
-          .join('\n'),
-      [created, updated, completed]
-    );
-
     return (
-      <span className={styles.wrapper} title={title}>
+      <Tooltip
+        className={styles.wrapper}
+        arrow={true}
+        title={
+          <div className={styles.tooltipText}>
+            {(
+              [
+                ['Created', created],
+                ['Updated', updated],
+                ['Completed', completed]
+              ] as [string, Date][]
+            )
+              .filter(([, date]) => date)
+              .map(([key, date], i) => (
+                <React.Fragment key={i}>
+                  <span>{key}</span>
+                  <span>{date.toLocaleString()}</span>
+                </React.Fragment>
+              ))}
+          </div>
+        }
+      >
         <AccessTimeIcon />
-      </span>
+      </Tooltip>
     );
   },
   (prev, curr) => prev.created === curr.created && prev.updated === curr.updated
