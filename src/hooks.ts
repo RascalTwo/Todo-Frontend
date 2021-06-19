@@ -11,14 +11,14 @@ export const useLocalState = <T>(
   const setValue: React.Dispatch<React.SetStateAction<T>> = action =>
     setStateValue(value => {
       const newValue = action instanceof Function ? action(value) : action;
-      localStorage.setItem(key, serialize(newValue));
+      window.localStorage.setItem(key, serialize(newValue));
       return newValue;
     });
 
   useEffect(
     () =>
       setStateValue(() => {
-        const localInitial = localStorage.getItem(key);
+        const localInitial = window.localStorage.getItem(key);
         return localInitial === null ? initial : deserialize(localInitial);
       }),
     [key]

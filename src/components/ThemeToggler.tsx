@@ -5,7 +5,8 @@ import {
   PaletteType,
   Theme,
   ThemeProvider,
-  CssBaseline
+  CssBaseline,
+  useMediaQuery
 } from '@material-ui/core';
 
 import BrightnessMediumIcon from '@material-ui/icons/BrightnessMedium';
@@ -24,7 +25,7 @@ const useThemeToggle = (initial: PaletteType): [Theme, () => void] => {
 
 export default function ThemeToggler({ children }: { children: React.ReactNode }) {
   const [theme, toggleTheme] = useThemeToggle(
-    window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+    useMediaQuery('(prefers-color-scheme: dark)') ? 'dark' : 'light'
   );
 
   return (

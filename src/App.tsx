@@ -198,7 +198,7 @@ const useCode = (): [string, React.Dispatch<React.SetStateAction<string>>] => {
     setCodeValue(code => {
       const newCode = action instanceof Function ? action(code) : action;
 
-      history.pushState(
+      window.history.pushState(
         {},
         '',
         import.meta.env.BASE_URL + (import.meta.env.VITE_HASH_ROUTING ? '#' : '') + newCode
