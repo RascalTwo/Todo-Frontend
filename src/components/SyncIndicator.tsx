@@ -4,7 +4,7 @@ import SyncIcon from '@material-ui/icons/Sync';
 import SyncDisabledIcon from '@material-ui/icons/SyncDisabled';
 import SyncProblemIcon from '@material-ui/icons/SyncProblem';
 import SyncAltIcon from '@material-ui/icons/SyncAlt';
-import { makeStyles } from '@material-ui/core';
+import { makeStyles, Badge } from '@material-ui/core';
 
 const useStyles = makeStyles({
   wrapper: {
@@ -45,12 +45,17 @@ export default function SyncIndicator({
       </span>
     );
 
+  const otherCount = realtimeMemberCount - 1;
+
   return (
-    <span
+    <Badge
       className={styles.wrapper}
-      title={'Realtime' + (realtimeMemberCount ? ` - with ${realtimeMemberCount} others` : '')}
+      title={
+        'Realtime' + (otherCount ? ` - with ${otherCount} other${otherCount > 1 ? 's' : ''}` : '')
+      }
+      badgeContent={otherCount}
     >
       <SyncAltIcon />
-    </span>
+    </Badge>
   );
 }
