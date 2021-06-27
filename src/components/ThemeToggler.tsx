@@ -13,6 +13,7 @@ import BrightnessMediumIcon from '@material-ui/icons/BrightnessMedium';
 
 import { useLocalState } from '../hooks';
 
+/** Allow Toggling of {@link PaletteType} */
 const useThemeToggle = (initial: PaletteType): [Theme, () => void] => {
   const [type, setType] = useLocalState('theme', initial);
   return [
@@ -23,6 +24,10 @@ const useThemeToggle = (initial: PaletteType): [Theme, () => void] => {
   ];
 };
 
+/**
+ * Wrapper to apply {@link useThemeToggle toggleable theme} to children,
+ * initally from [prefers-color-schema](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme)
+ */
 export default function ThemeToggler({ children }: { children: React.ReactNode }) {
   const [theme, toggleTheme] = useThemeToggle(
     useMediaQuery('(prefers-color-scheme: dark)') ? 'dark' : 'light'

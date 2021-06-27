@@ -26,6 +26,7 @@ const useStyles = makeStyles({
   }
 });
 
+/** Editable display of the current Todo List Code */
 export default function VisitListCode({
   code,
   setCode

@@ -15,6 +15,7 @@ const useStyles = makeStyles({
   }
 });
 
+/** Icon with a {@link Tooltip} showcasing all dates of the Todo */
 export default React.memo(
   function WhenIcon({
     created,

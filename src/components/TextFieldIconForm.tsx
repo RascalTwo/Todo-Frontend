@@ -6,7 +6,8 @@ import {
   TextFieldProps,
   Paper,
   InputAdornment,
-  IconButtonProps
+  IconButtonProps,
+  InputBaseProps
 } from '@material-ui/core';
 
 const useStyles = makeStyles({
@@ -32,6 +33,10 @@ export type TextFieldIconFormProps = {
   resetOnSuccess?: boolean;
 } & TextFieldProps;
 
+/**
+ * Customized {@link TextField} wrapped in a form with a
+ * {@link IconButton} {@link InputBaseProps.endAdornment endAdornment}
+ */
 export default function TextFieldIconForm({
   onSubmission,
   children,

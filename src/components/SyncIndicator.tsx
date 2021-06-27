@@ -14,6 +14,7 @@ const useStyles = makeStyles({
   }
 });
 
+/** Indicator for server connection status */
 export default function SyncIndicator({
   code,
   serverOnline,

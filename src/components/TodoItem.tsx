@@ -25,6 +25,7 @@ const useTodoItemStyles = makeStyles({
   }
 });
 
+/** {@link ListItem} of {@link Todo} */
 export default React.memo(
   function TodoItem({
     todo,
