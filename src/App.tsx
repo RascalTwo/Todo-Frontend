@@ -38,11 +38,13 @@ const useTodos = (
     todos => JSON.stringify(serializeTodos(todos)),
     rawTodos => parseTodos(JSON.parse(rawTodos))
   );
+  const [csrf, setCSRF] = useState<string | null>('');
 
   const isLocal = useMemo(() => !code, [code]);
 
   const WSAPI = API.useWSAPI(
     code,
+    csrf,
     serverOnline && !isLocal,
     todo => setTodos(todos => [...todos, todo]),
     updatedTodo =>
@@ -65,13 +67,20 @@ const useTodos = (
 
   const isServerOnline = useCallback(
     () =>
-      isLocal ? Promise.resolve(false) : WSAPI.ws ? Promise.resolve(true) : checkServerOnline(),
-    [isLocal, WSAPI.ws]
+      isLocal
+        ? Promise.resolve(false)
+        : WSAPI.connected
+        ? Promise.resolve(true)
+        : checkServerOnline(),
+    [isLocal, WSAPI.connected]
   );
 
   useEffect(() => {
     if (!serverOnline || isLocal) return;
-    API.readTodos(code).then(parseTodos).then(setTodos);
+    API.readTodos(code).then(({ csrf_token, todos: rawTodos }) => {
+      setCSRF(csrf_token);
+      return parseTodos(rawTodos);
+    }).then(setTodos);
   }, [isLocal, code, serverOnline]);
 
   const addTodo = useCallback(
@@ -93,7 +102,7 @@ const useTodos = (
             };
             if (!serverOnline || isLocal) return [...todos, todo];
 
-            if (WSAPI.ws) WSAPI.createTodo(newText);
+            if (WSAPI.connected) WSAPI.createTodo(newText);
             else
               API.createTodo(code, newText)
                 .then(rawTodo => parseTodos([rawTodo])[0])
@@ -103,7 +112,7 @@ const useTodos = (
           })
         )
       ),
-    [WSAPI.ws, isLocal, code, setTodos, API.createTodo]
+    [WSAPI.connected, isLocal, code, setTodos, API.createTodo]
   );
 
   const updateTodo = useCallback(
@@ -131,7 +140,7 @@ const useTodos = (
             };
             if (!serverOnline || isLocal) return replaceAtIndex(todos, updatingIndex, updatedTodo);
 
-            if (WSAPI.ws) WSAPI.updateTodo({ created: created.getTime(), text: newText });
+            if (WSAPI.connected) WSAPI.updateTodo({ created: created.getTime(), text: newText });
             else
               API.updateTodo(code, { created: created.getTime(), text: newText })
                 .then(rawTodo => parseTodos([rawTodo])[0])
@@ -141,7 +150,7 @@ const useTodos = (
           })
         )
       ),
-    [WSAPI.ws, isLocal, code, setTodos, API.updateTodo]
+    [WSAPI.connected, isLocal, code, setTodos, API.updateTodo]
   );
 
   const deleteTodo = useCallback(
@@ -153,14 +162,14 @@ const useTodos = (
           );
           if (!serverOnline || isLocal) return removeAtIndex(todos, removingIndex);
 
-          if (WSAPI.ws) WSAPI.deleteTodo(created);
+          if (WSAPI.connected) WSAPI.deleteTodo(created);
           else
             API.deleteTodo(code, created).then(() => setTodos(removeAtIndex(todos, removingIndex)));
 
           return todos;
         })
       ),
-    [WSAPI.ws, isLocal, code, setTodos, API.deleteTodo]
+    [WSAPI.connected, isLocal, code, setTodos, API.deleteTodo]
   );
 
   const toggleCompleted = useCallback(
@@ -174,7 +183,7 @@ const useTodos = (
           if (!serverOnline || isLocal)
             return replaceAtIndex(todos, updatingIndex, { ...todos[updatingIndex], completed });
 
-          if (WSAPI.ws)
+          if (WSAPI.connected)
             WSAPI.updateTodo({
               created: created.getTime(),
               completed: completed?.getTime() || null
@@ -190,7 +199,7 @@ const useTodos = (
           return todos;
         })
       ),
-    [WSAPI.ws, isLocal, code, setTodos, API.updateTodo]
+    [WSAPI.connected, isLocal, code, setTodos, API.updateTodo]
   );
 
   return {
