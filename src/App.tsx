@@ -13,12 +13,14 @@ import * as API from './API';
 import { useLocalState } from './hooks';
 import SyncIndicator from './components/SyncIndicator';
 
+/** Replace element at index in the provided array, returns copy of new array */
 const replaceAtIndex = <T extends any>(array: T[], index: number, replacement: T): T[] => [
   ...array.slice(0, index),
   replacement,
   ...array.slice(index + 1)
 ];
 
+/** Remove element at index in the provided array, returns copy of new array */
 const removeAtIndex = <T extends any>(array: T[], index: number): T[] => [
   ...array.slice(0, index),
   ...array.slice(index + 1)
@@ -27,6 +29,7 @@ const removeAtIndex = <T extends any>(array: T[], index: number): T[] => [
 const useTodos = (
   code: string,
   serverOnline: boolean,
+  checkServerOnline: () => Promise<boolean>,
   setRealtime: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   const [todos, setTodos] = useLocalState<Todo[]>(
@@ -60,6 +63,12 @@ const useTodos = (
     setRealtime
   );
 
+  const isServerOnline = useCallback(
+    () =>
+      isLocal ? Promise.resolve(false) : WSAPI.ws ? Promise.resolve(true) : checkServerOnline(),
+    [isLocal, WSAPI.ws]
+  );
+
   useEffect(() => {
     if (!serverOnline || isLocal) return;
     API.readTodos(code).then(parseTodos).then(setTodos);
@@ -68,100 +77,120 @@ const useTodos = (
   const addTodo = useCallback(
     (newText: string) =>
       new Promise<void>((resolve, reject) =>
-        setTodos(todos => {
-          const existingTodo = todos.find(({ text }) => text === newText);
-          if (existingTodo) {
-            reject(new Error('TODO already exists'));
+        isServerOnline().then(serverOnline =>
+          setTodos(todos => {
+            const existingTodo = todos.find(({ text }) => text === newText);
+            if (existingTodo) {
+              reject(new Error('TODO already exists'));
+              return todos;
+            }
+            resolve();
+            const todo = {
+              created: new Date(),
+              updated: new Date(),
+              text: newText,
+              completed: null
+            };
+            if (!serverOnline || isLocal) return [...todos, todo];
+
+            if (WSAPI.ws) WSAPI.createTodo(newText);
+            else
+              API.createTodo(code, newText)
+                .then(rawTodo => parseTodos([rawTodo])[0])
+                .then(todo => setTodos([...todos, todo]));
+
             return todos;
-          }
-          resolve();
-          const todo = { created: new Date(), updated: new Date(), text: newText, completed: null };
-          if (!serverOnline || isLocal) return [...todos, todo];
-
-          if (WSAPI.ws) WSAPI.createTodo(newText);
-          else
-            API.createTodo(code, newText)
-              .then(rawTodo => parseTodos([rawTodo])[0])
-              .then(todo => setTodos([...todos, todo]));
-
-          return todos;
-        })
+          })
+        )
       ),
-    [WSAPI.ws, isLocal, code, setTodos, serverOnline, API.createTodo]
+    [WSAPI.ws, isLocal, code, setTodos, API.createTodo]
   );
 
   const updateTodo = useCallback(
     (created: Date, newText: string) =>
-      new Promise<void>((resolve, reject) => {
-        return setTodos(todos => {
-          const existingTodo = todos.find(
-            todo => created.valueOf() !== todo.created.valueOf() && todo.text === newText
-          );
-          if (existingTodo) {
-            reject(Error('TODO already exists'));
+      new Promise<void>((resolve, reject) =>
+        isServerOnline().then(serverOnline =>
+          setTodos(todos => {
+            const existingTodo = todos.find(
+              todo => created.valueOf() !== todo.created.valueOf() && todo.text === newText
+            );
+            if (existingTodo) {
+              reject(Error('TODO already exists'));
+              return todos;
+            }
+            resolve();
+            const updated = new Date();
+
+            const updatingIndex = todos.findIndex(
+              todo => todo.created.valueOf() === created.valueOf()
+            );
+            const updatedTodo = {
+              ...todos[updatingIndex],
+              updated,
+              text: newText
+            };
+            if (!serverOnline || isLocal) return replaceAtIndex(todos, updatingIndex, updatedTodo);
+
+            if (WSAPI.ws) WSAPI.updateTodo({ created: created.getTime(), text: newText });
+            else
+              API.updateTodo(code, { created: created.getTime(), text: newText })
+                .then(rawTodo => parseTodos([rawTodo])[0])
+                .then(todo => setTodos(replaceAtIndex(todos, updatingIndex, todo)));
+
             return todos;
-          }
-          resolve();
-          const updated = new Date();
-
-          const updatingIndex = todos.findIndex(
-            todo => todo.created.valueOf() === created.valueOf()
-          );
-          const updatedTodo = {
-            ...todos[updatingIndex],
-            updated,
-            text: newText
-          };
-          if (!serverOnline || isLocal) return replaceAtIndex(todos, updatingIndex, updatedTodo);
-
-          if (WSAPI.ws) WSAPI.updateTodo({ created: created.getTime(), text: newText });
-          else
-            API.updateTodo(code, { created: created.getTime(), text: newText })
-              .then(rawTodo => parseTodos([rawTodo])[0])
-              .then(todo => setTodos(replaceAtIndex(todos, updatingIndex, todo)));
-
-          return todos;
-        });
-      }),
-    [WSAPI.ws, isLocal, code, setTodos, serverOnline, API.updateTodo]
+          })
+        )
+      ),
+    [WSAPI.ws, isLocal, code, setTodos, API.updateTodo]
   );
 
   const deleteTodo = useCallback(
     (created: Date) =>
-      setTodos(todos => {
-        const removingIndex = todos.findIndex(todo => todo.created.valueOf() === created.valueOf());
-        if (!serverOnline || isLocal) return removeAtIndex(todos, removingIndex);
+      isServerOnline().then(serverOnline =>
+        setTodos(todos => {
+          const removingIndex = todos.findIndex(
+            todo => todo.created.valueOf() === created.valueOf()
+          );
+          if (!serverOnline || isLocal) return removeAtIndex(todos, removingIndex);
 
-        if (WSAPI.ws) WSAPI.deleteTodo(created);
-        else
-          API.deleteTodo(code, created).then(() => setTodos(removeAtIndex(todos, removingIndex)));
+          if (WSAPI.ws) WSAPI.deleteTodo(created);
+          else
+            API.deleteTodo(code, created).then(() => setTodos(removeAtIndex(todos, removingIndex)));
 
-        return todos;
-      }),
-    [WSAPI.ws, isLocal, code, setTodos, serverOnline, API.deleteTodo]
+          return todos;
+        })
+      ),
+    [WSAPI.ws, isLocal, code, setTodos, API.deleteTodo]
   );
 
   const toggleCompleted = useCallback(
     (created: Date) =>
-      setTodos(todos => {
-        const updatingIndex = todos.findIndex(todo => todo.created.valueOf() === created.valueOf());
-        const completed = todos[updatingIndex].completed ? null : new Date();
-        if (!serverOnline || isLocal)
-          return replaceAtIndex(todos, updatingIndex, { ...todos[updatingIndex], completed });
+      isServerOnline().then(serverOnline =>
+        setTodos(todos => {
+          const updatingIndex = todos.findIndex(
+            todo => todo.created.valueOf() === created.valueOf()
+          );
+          const completed = todos[updatingIndex].completed ? null : new Date();
+          if (!serverOnline || isLocal)
+            return replaceAtIndex(todos, updatingIndex, { ...todos[updatingIndex], completed });
 
-        if (WSAPI.ws)
-          WSAPI.updateTodo({ created: created.getTime(), completed: completed?.getTime() || null });
-        else
-          API.updateTodo(code, {
-            created: created.getTime(),
-            completed: completed?.getTime() || null
-          })
-            .then(rawTodo => parseTodos([rawTodo])[0])
-            .then(todo => setTodos(replaceAtIndex(todos, updatingIndex, todo)));
+          if (WSAPI.ws)
+            WSAPI.updateTodo({
+              created: created.getTime(),
+              completed: completed?.getTime() || null
+            });
+          else
+            API.updateTodo(code, {
+              created: created.getTime(),
+              completed: completed?.getTime() || null
+            })
+              .then(rawTodo => parseTodos([rawTodo])[0])
+              .then(todo => setTodos(replaceAtIndex(todos, updatingIndex, todo)));
 
-        return todos;
-      }),
-    [WSAPI.ws, isLocal, code, setTodos, serverOnline, API.updateTodo]
+          return todos;
+        })
+      ),
+    [WSAPI.ws, isLocal, code, setTodos, API.updateTodo]
   );
 
   return {
@@ -174,14 +203,23 @@ const useTodos = (
   };
 };
 
-const useServerOnline = () => {
+const useServerOnline = (): [boolean | null, () => Promise<boolean>] => {
   const [serverOnline, setServerOnline] = useState<boolean | null>(null);
 
   useEffect(() => {
     API.isServerOnline().then(setServerOnline);
   }, []);
 
-  return serverOnline;
+  const checkServerOnline = useCallback(
+    () =>
+      API.isServerOnline().then(online => {
+        setServerOnline(online);
+        return online;
+      }),
+    []
+  );
+
+  return [serverOnline, checkServerOnline];
 };
 
 const useCode = (): [string, React.Dispatch<React.SetStateAction<string>>] => {
@@ -218,11 +256,12 @@ const useTitle = (setter: (...deps: DependencyList) => string, deps: DependencyL
 function App() {
   const [code, setCode] = useCode();
   useTitle((code: string) => 'Todos - ' + (code ? `#${code}` : 'Local'), [code]);
-  const serverOnline = useServerOnline();
+  const [serverOnline, checkServerOnline] = useServerOnline();
   const [realtime, setRealtime] = useState(false);
   const { todos, addTodo, updateTodo, deleteTodo, toggleCompleted, realtimeMemberCount } = useTodos(
     code,
     !!serverOnline,
+    checkServerOnline,
     setRealtime
   );
 
@@ -238,9 +277,9 @@ function App() {
         <VisitListCode code={code} setCode={setCode} />
         <NewTodo onSubmission={addTodo} />
         <List>
-          {todos.map((item, i) => (
+          {todos.map(item => (
             <TodoItem
-              key={i}
+              key={item.created.valueOf()}
               todo={item}
               onUpdate={updateTodo}
               onDelete={deleteTodo}

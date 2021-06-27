@@ -6,7 +6,10 @@ const API_HOST = import.meta.env['VITE_SERVER_HOST'] || window.location.host;
 const IS_SECURE = window.location.protocol.includes('https');
 const REST_PREFIX = `${window.location.protocol}//${API_HOST}`;
 
-export const isServerOnline = (): Promise<boolean> => fetch(`${REST_PREFIX}/api`).then(r => r.ok);
+export const isServerOnline = (): Promise<boolean> =>
+  fetch(`${REST_PREFIX}/api`)
+    .then(r => r.ok)
+    .catch(() => false);
 
 export const readTodos = (code: string): Promise<LocalTodo[]> =>
   fetch(`${REST_PREFIX}/api/${code}`).then(r => r.json());
