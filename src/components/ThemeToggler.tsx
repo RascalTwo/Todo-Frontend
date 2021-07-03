@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   createMuiTheme,
   IconButton,
@@ -17,9 +17,9 @@ import { useLocalState } from '../hooks';
 const useThemeToggle = (initial: PaletteType): [Theme, () => void] => {
   const [type, setType] = useLocalState('theme', initial);
   return [
-    createMuiTheme({
+    useMemo(() => createMuiTheme({
       palette: { type }
-    }),
+    }), [type]),
     useCallback(() => setType(type => (type === 'dark' ? 'light' : 'dark')), [setType])
   ];
 };
