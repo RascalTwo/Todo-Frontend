@@ -235,10 +235,11 @@ const useCode = (): [string, React.Dispatch<React.SetStateAction<string>>] => {
   const [code, setCodeValue] = useState(
     import.meta.env.VITE_HASH_ROUTING
       ? window.location.hash.slice(1)
-      : window.location.pathname
-          .split(import.meta.env.BASE_URL)
+      : window.location.pathname.includes(import.meta.env.BASE_URL)
+        ? window.location.pathname.split(import.meta.env.BASE_URL)
           .slice(1)
           .join('/')
+        : window.location.pathname.slice(1)
   );
 
   const setCode: React.Dispatch<React.SetStateAction<string>> = action =>
