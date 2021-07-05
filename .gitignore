@@ -7,3 +7,5 @@ public-ssr
 *.local
 .env
 .kanbn
+.eslintcache
+*.tsbuildinfo
