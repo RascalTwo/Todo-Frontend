@@ -24,10 +24,12 @@ const useThemeToggle = (initial: PaletteType): [Theme, () => void] => {
   ];
 };
 
+/* eslint-disable */
 /**
  * Wrapper to apply {@link useThemeToggle toggleable theme} to children,
  * initally from [prefers-color-schema](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme)
  */
+/* eslint-enable */
 export default function ThemeToggler({ children }: { children: React.ReactNode }) {
   const [theme, toggleTheme] = useThemeToggle(
     useMediaQuery('(prefers-color-scheme: dark)') ? 'dark' : 'light'

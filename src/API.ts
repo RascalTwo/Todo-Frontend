@@ -96,7 +96,7 @@ export const useWSAPI = (
     };
   }, [code, connect, csrf]);
 
-  const sendAction = (action: string, payload: any) =>
+  const sendAction = (action: string, payload: unknown) =>
     wsRef.current?.send(JSON.stringify([action, payload]));
 
   const createTodo = (text: string) => sendAction('create', text);

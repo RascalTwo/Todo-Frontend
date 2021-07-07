@@ -14,14 +14,14 @@ import { useLocalState } from './hooks';
 import SyncIndicator from './components/SyncIndicator';
 
 /** Replace element at index in the provided array, returns copy of new array */
-const replaceAtIndex = <T extends any>(array: T[], index: number, replacement: T): T[] => [
+const replaceAtIndex = <T extends unknown>(array: T[], index: number, replacement: T): T[] => [
   ...array.slice(0, index),
   replacement,
   ...array.slice(index + 1)
 ];
 
 /** Remove element at index in the provided array, returns copy of new array */
-const removeAtIndex = <T extends any>(array: T[], index: number): T[] => [
+const removeAtIndex = <T extends unknown>(array: T[], index: number): T[] => [
   ...array.slice(0, index),
   ...array.slice(index + 1)
 ];

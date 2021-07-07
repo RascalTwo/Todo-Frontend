@@ -7,7 +7,6 @@ import {
   Paper,
   InputAdornment,
   IconButtonProps,
-  InputBaseProps
 } from '@material-ui/core';
 
 const useStyles = makeStyles({
