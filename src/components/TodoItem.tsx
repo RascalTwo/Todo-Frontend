@@ -22,6 +22,9 @@ const useTodoItemStyles = makeStyles({
     '&[data-completed="true"]': {
       textDecoration: 'line-through'
     }
+  },
+  innerText: {
+    width: '77.5%'
   }
 });
 
@@ -109,7 +112,10 @@ export default React.memo(
     ) : (
       <ListItem divider={true} button onClick={handleToggle}>
         {itemIcon}
-        <ListItemText classes={{ root: styles.completedText }} data-completed={!!todo.completed}>
+        <ListItemText
+          classes={{ root: styles.completedText, primary: styles.innerText }}
+          data-completed={!!todo.completed}
+        >
           {todo.text}
         </ListItemText>
         <ListItemSecondaryAction>
