@@ -17,6 +17,13 @@ The initial Todo list is only stored in [localStorage], while all other are repl
 
 When the [backend] server is available, multiple clients can interact with the same Todo list in realtime via [WebSockets]
 
+## Environment Variables
+
+| Variable            | Default Value | Description |
+| -                   | -             | -           |
+| `VITE_SERVER_HOST`  |               | Host of backend server to connect to |
+| `VITE_HASH_ROUTING` | `false`       | Teather to use Hash or Browser routing |
+
 ## Structure
 
 > Click for interactive version
