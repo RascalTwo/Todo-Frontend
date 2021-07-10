@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { parseTodos } from './todo';
-import { LocalTodo, Todo, TodoChanges } from './types';
+import { RawTodo, Todo, TodoChanges } from './types';
 
 const API_HOST = import.meta.env['VITE_SERVER_HOST'] || window.location.host;
 const IS_SECURE = window.location.protocol.includes('https');
@@ -11,17 +11,17 @@ export const isServerOnline = (): Promise<boolean> =>
     .then(r => r.ok)
     .catch(() => false);
 
-export const readTodos = (code: string): Promise<{ csrf_token: string; todos: LocalTodo[] }> =>
+export const readTodos = (code: string): Promise<{ csrf_token: string; todos: RawTodo[] }> =>
   fetch(`${REST_PREFIX}/api/${code}`, { credentials: 'include' }).then(r => r.json());
 
-export const createTodo = (code: string, text: string): Promise<LocalTodo> =>
+export const createTodo = (code: string, text: string): Promise<RawTodo> =>
   fetch(`${REST_PREFIX}/api/${code}`, {
     credentials: 'include',
     method: 'POST',
     body: text
   }).then(r => r.json());
 
-export const updateTodo = (code: string, changes: TodoChanges): Promise<LocalTodo> =>
+export const updateTodo = (code: string, changes: TodoChanges): Promise<RawTodo> =>
   fetch(`${REST_PREFIX}/api/${code}`, {
     credentials: 'include',
     method: 'PUT',
@@ -69,14 +69,14 @@ export const useWSAPI = (
     ws.addEventListener('message', e => {
       const [action, payload]: [
         'create' | 'update' | 'delete' | 'memberCount' | 'error',
-        LocalTodo | number
+        RawTodo | number
       ] = JSON.parse(e.data);
       switch (action) {
         case 'create':
-          onCreate(parseTodos([payload as LocalTodo])[0]);
+          onCreate(parseTodos([payload as RawTodo])[0]);
           break;
         case 'update':
-          onUpdate(parseTodos([payload as LocalTodo])[0]);
+          onUpdate(parseTodos([payload as RawTodo])[0]);
           break;
         case 'delete':
           onDelete(new Date(payload as number));

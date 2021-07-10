@@ -5,7 +5,7 @@ export type Todo = {
   completed: Date | null;
 };
 
-export type LocalTodo = {
+export type RawTodo = {
   created: number;
   updated: number | null;
   text: string;
