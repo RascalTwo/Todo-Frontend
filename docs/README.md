@@ -1,7 +1,7 @@
 [backend]: ../../../../Todo-Backend
 [localStorage]: https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage
 [WebSockets]: https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API
-[dependancygraph]: ./dependencygraph.svg?raw=1
+[graph]: ./graph.svg?raw=1
 
 # Todo Frontend
 
@@ -28,4 +28,8 @@ When the [backend] server is available, multiple clients can interact with the s
 
 > Click for interactive version
 
-[![homepage][dependancygraph]][dependancygraph]
+<details>
+  <summary>Local Files</summary>
+
+  [![][graph]][graph]
+</details>
