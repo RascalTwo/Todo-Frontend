@@ -5,6 +5,8 @@
 
 # Todo Frontend
 
+[![Pages](https://github.com/RascalTwo/Todo-Frontend/actions/workflows/main.yml/badge.svg?event=workflow_dispatch)](https://rascaltwo.github.io/Todo-Frontend)
+
 TypeScript + Vite + React + MaterialUI Frontend for managing Todo items.
 
 It's designed to be paired with [Todo Backend][backend], but can work without it thanks to [localStorage]
