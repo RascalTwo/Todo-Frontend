@@ -1,0 +1,8 @@
+.dockerignore
+Dockerfile
+.git
+node_modules
+.env
+tsconfig.tsbuildinfo
+public
+.eslintcache
