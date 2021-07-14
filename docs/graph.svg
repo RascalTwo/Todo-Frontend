@@ -22,7 +22,7 @@
 <!-- src/API.ts -->
 <g id="node1" class="node">
 <title>src/API.ts</title>
-<g id="a_node1"><a xlink:href="https://github.com/RascalTwo/Todo-Backend/blob/main/src/API.ts" xlink:title="API.ts">
+<g id="a_node1"><a xlink:href="https://github.com/RascalTwo/Todo-Frontend/blob/main/src/API.ts" xlink:title="API.ts">
 <path fill="#ddfeff" stroke="#000000" d="M231,-274.3024C231,-274.3024 189,-274.3024 189,-274.3024 186,-274.3024 183,-271.3024 183,-268.3024 183,-268.3024 183,-262.3024 183,-262.3024 183,-259.3024 186,-256.3024 189,-256.3024 189,-256.3024 231,-256.3024 231,-256.3024 234,-256.3024 237,-259.3024 237,-262.3024 237,-262.3024 237,-268.3024 237,-268.3024 237,-271.3024 234,-274.3024 231,-274.3024"/>
 <text text-anchor="middle" x="210" y="-263.1024" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000000">API.ts</text>
 </a>
@@ -31,7 +31,7 @@
 <!-- src/todo.ts -->
 <g id="node2" class="node">
 <title>src/todo.ts</title>
-<g id="a_node2"><a xlink:href="https://github.com/RascalTwo/Todo-Backend/blob/main/src/todo.ts" xlink:title="todo.ts">
+<g id="a_node2"><a xlink:href="https://github.com/RascalTwo/Todo-Frontend/blob/main/src/todo.ts" xlink:title="todo.ts">
 <path fill="#ddfeff" stroke="#000000" d="M342,-288.3024C342,-288.3024 300,-288.3024 300,-288.3024 297,-288.3024 294,-285.3024 294,-282.3024 294,-282.3024 294,-276.3024 294,-276.3024 294,-273.3024 297,-270.3024 300,-270.3024 300,-270.3024 342,-270.3024 342,-270.3024 345,-270.3024 348,-273.3024 348,-276.3024 348,-276.3024 348,-282.3024 348,-282.3024 348,-285.3024 345,-288.3024 342,-288.3024"/>
 <text text-anchor="middle" x="321" y="-277.1024" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000000">todo.ts</text>
 </a>
@@ -46,7 +46,7 @@
 <!-- src/types.ts -->
 <g id="node3" class="node">
 <title>src/types.ts</title>
-<g id="a_node3"><a xlink:href="https://github.com/RascalTwo/Todo-Backend/blob/main/src/types.ts" xlink:title="types.ts">
+<g id="a_node3"><a xlink:href="https://github.com/RascalTwo/Todo-Frontend/blob/main/src/types.ts" xlink:title="types.ts">
 <path fill="#ddfeff" stroke="#000000" d="M438,-199.3024C438,-199.3024 396,-199.3024 396,-199.3024 393,-199.3024 390,-196.3024 390,-193.3024 390,-193.3024 390,-187.3024 390,-187.3024 390,-184.3024 393,-181.3024 396,-181.3024 396,-181.3024 438,-181.3024 438,-181.3024 441,-181.3024 444,-184.3024 444,-187.3024 444,-187.3024 444,-193.3024 444,-193.3024 444,-196.3024 441,-199.3024 438,-199.3024"/>
 <text text-anchor="middle" x="417" y="-188.1024" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000000">types.ts</text>
 </a>
@@ -67,7 +67,7 @@
 <!-- src/App.tsx -->
 <g id="node4" class="node">
 <title>src/App.tsx</title>
-<g id="a_node4"><a xlink:href="https://github.com/RascalTwo/Todo-Backend/blob/main/src/App.tsx" xlink:title="App.tsx">
+<g id="a_node4"><a xlink:href="https://github.com/RascalTwo/Todo-Frontend/blob/main/src/App.tsx" xlink:title="App.tsx">
 <path fill="#bbfeff" stroke="#000000" d="M142.5,-162.3024C142.5,-162.3024 100.5,-162.3024 100.5,-162.3024 97.5,-162.3024 94.5,-159.3024 94.5,-156.3024 94.5,-156.3024 94.5,-150.3024 94.5,-150.3024 94.5,-147.3024 97.5,-144.3024 100.5,-144.3024 100.5,-144.3024 142.5,-144.3024 142.5,-144.3024 145.5,-144.3024 148.5,-147.3024 148.5,-150.3024 148.5,-150.3024 148.5,-156.3024 148.5,-156.3024 148.5,-159.3024 145.5,-162.3024 142.5,-162.3024"/>
 <text text-anchor="middle" x="121.5" y="-151.1024" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000000">App.tsx</text>
 </a>
@@ -94,7 +94,7 @@
 <!-- src/components/NewTodo.tsx -->
 <g id="node5" class="node">
 <title>src/components/NewTodo.tsx</title>
-<g id="a_node5"><a xlink:href="https://github.com/RascalTwo/Todo-Backend/blob/main/src/components/NewTodo.tsx" xlink:title="NewTodo.tsx">
+<g id="a_node5"><a xlink:href="https://github.com/RascalTwo/Todo-Frontend/blob/main/src/components/NewTodo.tsx" xlink:title="NewTodo.tsx">
 <path fill="#bbfeff" stroke="#000000" d="M239,-222.3024C239,-222.3024 181,-222.3024 181,-222.3024 178,-222.3024 175,-219.3024 175,-216.3024 175,-216.3024 175,-210.3024 175,-210.3024 175,-207.3024 178,-204.3024 181,-204.3024 181,-204.3024 239,-204.3024 239,-204.3024 242,-204.3024 245,-207.3024 245,-210.3024 245,-210.3024 245,-216.3024 245,-216.3024 245,-219.3024 242,-222.3024 239,-222.3024"/>
 <text text-anchor="middle" x="210" y="-211.1024" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000000">NewTodo.tsx</text>
 </a>
@@ -109,7 +109,7 @@
 <!-- src/components/SyncIndicator.tsx -->
 <g id="node6" class="node">
 <title>src/components/SyncIndicator.tsx</title>
-<g id="a_node6"><a xlink:href="https://github.com/RascalTwo/Todo-Backend/blob/main/src/components/SyncIndicator.tsx" xlink:title="SyncIndicator.tsx">
+<g id="a_node6"><a xlink:href="https://github.com/RascalTwo/Todo-Frontend/blob/main/src/components/SyncIndicator.tsx" xlink:title="SyncIndicator.tsx">
 <path fill="#bbfeff" stroke="#000000" d="M247,-192.3024C247,-192.3024 173,-192.3024 173,-192.3024 170,-192.3024 167,-189.3024 167,-186.3024 167,-186.3024 167,-180.3024 167,-180.3024 167,-177.3024 170,-174.3024 173,-174.3024 173,-174.3024 247,-174.3024 247,-174.3024 250,-174.3024 253,-177.3024 253,-180.3024 253,-180.3024 253,-186.3024 253,-186.3024 253,-189.3024 250,-192.3024 247,-192.3024"/>
 <text text-anchor="middle" x="210" y="-181.1024" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000000">SyncIndicator.tsx</text>
 </a>
@@ -124,7 +124,7 @@
 <!-- src/components/ThemeToggler.tsx -->
 <g id="node7" class="node">
 <title>src/components/ThemeToggler.tsx</title>
-<g id="a_node7"><a xlink:href="https://github.com/RascalTwo/Todo-Backend/blob/main/src/components/ThemeToggler.tsx" xlink:title="ThemeToggler.tsx">
+<g id="a_node7"><a xlink:href="https://github.com/RascalTwo/Todo-Frontend/blob/main/src/components/ThemeToggler.tsx" xlink:title="ThemeToggler.tsx">
 <path fill="#bbfeff" stroke="#000000" d="M249,-102.3024C249,-102.3024 171,-102.3024 171,-102.3024 168,-102.3024 165,-99.3024 165,-96.3024 165,-96.3024 165,-90.3024 165,-90.3024 165,-87.3024 168,-84.3024 171,-84.3024 171,-84.3024 249,-84.3024 249,-84.3024 252,-84.3024 255,-87.3024 255,-90.3024 255,-90.3024 255,-96.3024 255,-96.3024 255,-99.3024 252,-102.3024 249,-102.3024"/>
 <text text-anchor="middle" x="210" y="-91.1024" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000000">ThemeToggler.tsx</text>
 </a>
@@ -139,7 +139,7 @@
 <!-- src/components/TodoItem.tsx -->
 <g id="node8" class="node">
 <title>src/components/TodoItem.tsx</title>
-<g id="a_node8"><a xlink:href="https://github.com/RascalTwo/Todo-Backend/blob/main/src/components/TodoItem.tsx" xlink:title="TodoItem.tsx">
+<g id="a_node8"><a xlink:href="https://github.com/RascalTwo/Todo-Frontend/blob/main/src/components/TodoItem.tsx" xlink:title="TodoItem.tsx">
 <path fill="#bbfeff" stroke="#000000" d="M238,-132.3024C238,-132.3024 182,-132.3024 182,-132.3024 179,-132.3024 176,-129.3024 176,-126.3024 176,-126.3024 176,-120.3024 176,-120.3024 176,-117.3024 179,-114.3024 182,-114.3024 182,-114.3024 238,-114.3024 238,-114.3024 241,-114.3024 244,-117.3024 244,-120.3024 244,-120.3024 244,-126.3024 244,-126.3024 244,-129.3024 241,-132.3024 238,-132.3024"/>
 <text text-anchor="middle" x="210" y="-121.1024" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000000">TodoItem.tsx</text>
 </a>
@@ -154,7 +154,7 @@
 <!-- src/components/VisitListCode.tsx -->
 <g id="node9" class="node">
 <title>src/components/VisitListCode.tsx</title>
-<g id="a_node9"><a xlink:href="https://github.com/RascalTwo/Todo-Backend/blob/main/src/components/VisitListCode.tsx" xlink:title="VisitListCode.tsx">
+<g id="a_node9"><a xlink:href="https://github.com/RascalTwo/Todo-Frontend/blob/main/src/components/VisitListCode.tsx" xlink:title="VisitListCode.tsx">
 <path fill="#bbfeff" stroke="#000000" d="M246,-162.3024C246,-162.3024 174,-162.3024 174,-162.3024 171,-162.3024 168,-159.3024 168,-156.3024 168,-156.3024 168,-150.3024 168,-150.3024 168,-147.3024 171,-144.3024 174,-144.3024 174,-144.3024 246,-144.3024 246,-144.3024 249,-144.3024 252,-147.3024 252,-150.3024 252,-150.3024 252,-156.3024 252,-156.3024 252,-159.3024 249,-162.3024 246,-162.3024"/>
 <text text-anchor="middle" x="210" y="-151.1024" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000000">VisitListCode.tsx</text>
 </a>
@@ -169,7 +169,7 @@
 <!-- src/hooks.ts -->
 <g id="node10" class="node">
 <title>src/hooks.ts</title>
-<g id="a_node10"><a xlink:href="https://github.com/RascalTwo/Todo-Backend/blob/main/src/hooks.ts" xlink:title="hooks.ts">
+<g id="a_node10"><a xlink:href="https://github.com/RascalTwo/Todo-Frontend/blob/main/src/hooks.ts" xlink:title="hooks.ts">
 <path fill="#ddfeff" stroke="#000000" d="M342,-68.3024C342,-68.3024 300,-68.3024 300,-68.3024 297,-68.3024 294,-65.3024 294,-62.3024 294,-62.3024 294,-56.3024 294,-56.3024 294,-53.3024 297,-50.3024 300,-50.3024 300,-50.3024 342,-50.3024 342,-50.3024 345,-50.3024 348,-53.3024 348,-56.3024 348,-56.3024 348,-62.3024 348,-62.3024 348,-65.3024 345,-68.3024 342,-68.3024"/>
 <text text-anchor="middle" x="321" y="-57.1024" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000000">hooks.ts</text>
 </a>
@@ -184,7 +184,7 @@
 <!-- src/components/TextFieldIconForm.tsx -->
 <g id="node11" class="node">
 <title>src/components/TextFieldIconForm.tsx</title>
-<g id="a_node11"><a xlink:href="https://github.com/RascalTwo/Todo-Backend/blob/main/src/components/TextFieldIconForm.tsx" xlink:title="TextFieldIconForm.tsx">
+<g id="a_node11"><a xlink:href="https://github.com/RascalTwo/Todo-Frontend/blob/main/src/components/TextFieldIconForm.tsx" xlink:title="TextFieldIconForm.tsx">
 <path fill="#bbfeff" stroke="#000000" d="M368,-203.3024C368,-203.3024 274,-203.3024 274,-203.3024 271,-203.3024 268,-200.3024 268,-197.3024 268,-197.3024 268,-191.3024 268,-191.3024 268,-188.3024 271,-185.3024 274,-185.3024 274,-185.3024 368,-185.3024 368,-185.3024 371,-185.3024 374,-188.3024 374,-191.3024 374,-191.3024 374,-197.3024 374,-197.3024 374,-200.3024 371,-203.3024 368,-203.3024"/>
 <text text-anchor="middle" x="321" y="-192.1024" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000000">TextFieldIconForm.tsx</text>
 </a>
@@ -211,7 +211,7 @@
 <!-- src/components/WhenIcon.tsx -->
 <g id="node12" class="node">
 <title>src/components/WhenIcon.tsx</title>
-<g id="a_node12"><a xlink:href="https://github.com/RascalTwo/Todo-Backend/blob/main/src/components/WhenIcon.tsx" xlink:title="WhenIcon.tsx">
+<g id="a_node12"><a xlink:href="https://github.com/RascalTwo/Todo-Frontend/blob/main/src/components/WhenIcon.tsx" xlink:title="WhenIcon.tsx">
 <path fill="#bbfeff" stroke="#000000" d="M350.5,-154.3024C350.5,-154.3024 291.5,-154.3024 291.5,-154.3024 288.5,-154.3024 285.5,-151.3024 285.5,-148.3024 285.5,-148.3024 285.5,-142.3024 285.5,-142.3024 285.5,-139.3024 288.5,-136.3024 291.5,-136.3024 291.5,-136.3024 350.5,-136.3024 350.5,-136.3024 353.5,-136.3024 356.5,-139.3024 356.5,-142.3024 356.5,-142.3024 356.5,-148.3024 356.5,-148.3024 356.5,-151.3024 353.5,-154.3024 350.5,-154.3024"/>
 <text text-anchor="middle" x="321" y="-143.1024" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000000">WhenIcon.tsx</text>
 </a>
@@ -232,7 +232,7 @@
 <!-- src/index.css -->
 <g id="node13" class="node">
 <title>src/index.css</title>
-<g id="a_node13"><a xlink:href="https://github.com/RascalTwo/Todo-Backend/blob/main/src/index.css" xlink:title="index.css">
+<g id="a_node13"><a xlink:href="https://github.com/RascalTwo/Todo-Frontend/blob/main/src/index.css" xlink:title="index.css">
 <path fill="#ffffcc" stroke="#000000" d="M143,-192.3024C143,-192.3024 100,-192.3024 100,-192.3024 97,-192.3024 94,-189.3024 94,-186.3024 94,-186.3024 94,-180.3024 94,-180.3024 94,-177.3024 97,-174.3024 100,-174.3024 100,-174.3024 143,-174.3024 143,-174.3024 146,-174.3024 149,-177.3024 149,-180.3024 149,-180.3024 149,-186.3024 149,-186.3024 149,-189.3024 146,-192.3024 143,-192.3024"/>
 <text text-anchor="middle" x="121.5" y="-181.1024" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000000">index.css</text>
 </a>
@@ -241,7 +241,7 @@
 <!-- src/main.tsx -->
 <g id="node14" class="node">
 <title>src/main.tsx</title>
-<g id="a_node14"><a xlink:href="https://github.com/RascalTwo/Todo-Backend/blob/main/src/main.tsx" xlink:title="main.tsx">
+<g id="a_node14"><a xlink:href="https://github.com/RascalTwo/Todo-Frontend/blob/main/src/main.tsx" xlink:title="main.tsx">
 <path fill="#bbfeff" stroke="#000000" d="M69.5,-177.3024C69.5,-177.3024 27.5,-177.3024 27.5,-177.3024 24.5,-177.3024 21.5,-174.3024 21.5,-171.3024 21.5,-171.3024 21.5,-165.3024 21.5,-165.3024 21.5,-162.3024 24.5,-159.3024 27.5,-159.3024 27.5,-159.3024 69.5,-159.3024 69.5,-159.3024 72.5,-159.3024 75.5,-162.3024 75.5,-165.3024 75.5,-165.3024 75.5,-171.3024 75.5,-171.3024 75.5,-174.3024 72.5,-177.3024 69.5,-177.3024"/>
 <text text-anchor="middle" x="48.5" y="-166.1024" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000000">main.tsx</text>
 </a>
@@ -262,7 +262,7 @@
 <!-- src/vite&#45;env.d.ts -->
 <g id="node15" class="node">
 <title>src/vite&#45;env.d.ts</title>
-<g id="a_node15"><a xlink:href="https://github.com/RascalTwo/Todo-Backend/blob/main/src/vite-env.d.ts" xlink:title="vite&#45;env.d.ts">
+<g id="a_node15"><a xlink:href="https://github.com/RascalTwo/Todo-Frontend/blob/main/src/vite-env.d.ts" xlink:title="vite&#45;env.d.ts">
 <path fill="#ccffcc" stroke="#000000" d="M75,-93.3024C75,-93.3024 22,-93.3024 22,-93.3024 19,-93.3024 16,-90.3024 16,-87.3024 16,-87.3024 16,-81.3024 16,-81.3024 16,-78.3024 19,-75.3024 22,-75.3024 22,-75.3024 75,-75.3024 75,-75.3024 78,-75.3024 81,-78.3024 81,-81.3024 81,-81.3024 81,-87.3024 81,-87.3024 81,-90.3024 78,-93.3024 75,-93.3024"/>
 <text text-anchor="middle" x="48.5" y="-82.1024" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000000">vite&#45;env.d.ts</text>
 </a>
