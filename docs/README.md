@@ -7,6 +7,7 @@
 
 ![visitors](https://visitor-badge.glitch.me/badge?page_id=RascalTwo.Todo-Frontend)
 [![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/RascalTwo/Todo-Frontend)
+![GitHub package.json version](https://img.shields.io/github/package-json/v/RascalTwo/Todo-Frontend)
 [![Pages](https://github.com/RascalTwo/Todo-Frontend/actions/workflows/main.yml/badge.svg?event=workflow_dispatch)](https://rascaltwo.github.io/Todo-Frontend)
 ![Website](https://img.shields.io/website?url=https%3A%2F%2Frascaltwo.github.io%2FTodo-Frontend%2F)
 ![GitHub](https://img.shields.io/github/license/RascalTwo/Todo-Frontend)
