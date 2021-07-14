@@ -53,6 +53,9 @@ export const useWSAPI = (
       Date.now().toString(),
       csrf
     ]);
+
+    ws.addEventListener('error', console.error);
+
     ws.addEventListener('open', () => {
       wsRef.current = ws;
       setRealtime(true);
