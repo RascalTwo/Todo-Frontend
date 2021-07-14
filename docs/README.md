@@ -1,4 +1,5 @@
 [backend]: ../../../../Todo-Backend
+[fullstack]: ../../../../Todo-Fullstack
 [localStorage]: https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage
 [WebSockets]: https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API
 [graph]: ./graph.svg?raw=1
@@ -58,6 +59,8 @@
 TypeScript + Vite + React + Material UI Frontend for managing Todo items.
 
 It's designed to be paired with [Todo Backend][backend], but can work without it thanks to [localStorage]
+
+Full deployment/development with the [Backend][backend] can be achieved by using the [Todo Fullstack][fullstack] repository.
 
 ## Features
 
