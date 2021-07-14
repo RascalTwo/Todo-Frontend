@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState, Suspense } from 'react';
 
 import {
   makeStyles,
@@ -8,8 +8,8 @@ import {
   ListItemIcon,
   ListItemSecondaryAction,
   ListItemText,
-  TextField
 } from '@material-ui/core';
+const TextField = React.lazy(() => import('@material-ui/core/TextField'));
 
 import { Edit, Delete, Save, Cancel } from '@material-ui/icons';
 
@@ -91,13 +91,15 @@ export default React.memo(
       <ListItem divider={true}>
         <form onSubmit={handleUpdate}>
           {itemIcon}
-          <TextField
-            autoFocus
-            error={!!error}
-            helperText={error}
-            placeholder="Item"
-            defaultValue={todo.text}
-          />
+          <Suspense fallback="">
+            <TextField
+              autoFocus
+              error={!!error}
+              helperText={error}
+              placeholder="Item"
+              defaultValue={todo.text}
+            />
+          </Suspense>
           <ListItemSecondaryAction>
             <IconButton type="submit" title="Edit">
               <Save />

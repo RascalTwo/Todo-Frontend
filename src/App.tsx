@@ -1,8 +1,8 @@
-import React, { DependencyList, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { Suspense, DependencyList, useCallback, useEffect, useMemo, useState } from 'react';
 import { Container, List } from '@material-ui/core';
 
 import NewTodo from './components/NewTodo';
-import TodoItem from './components/TodoItem';
+const TodoItem = React.lazy(() => import('./components/TodoItem'));
 import ThemeToggler from './components/ThemeToggler';
 import VisitListCode from './components/VisitListCode';
 
@@ -288,13 +288,17 @@ function App() {
         <NewTodo onSubmission={addTodo} />
         <List>
           {todos.map(item => (
-            <TodoItem
+            <Suspense
               key={item.created.valueOf()}
-              todo={item}
-              onUpdate={updateTodo}
-              onDelete={deleteTodo}
-              onToggle={toggleCompleted}
-            />
+              fallback=""
+            >
+              <TodoItem
+                todo={item}
+                onUpdate={updateTodo}
+                onDelete={deleteTodo}
+                onToggle={toggleCompleted}
+              />
+            </Suspense>
           ))}
         </List>
       </Container>
