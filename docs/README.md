@@ -58,7 +58,7 @@
 
 TypeScript + Vite + React + Material UI Frontend for managing Todo items.
 
-It's designed to be paired with [Todo Backend][backend], but can work without it thanks to [localStorage]
+It's designed to be paired with [![Todo Backend package.json version](https://img.shields.io/github/package-json/v/RascalTwo/Todo-Backend?label=Todo%20Backend)][backend], but can work without it thanks to [localStorage]
 
 Full deployment/development with the [Backend][backend] can be achieved by using the [Todo Fullstack][fullstack] repository.
 
